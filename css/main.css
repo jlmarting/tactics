@@ -5,3 +5,5 @@ body {
 #tactics {
     background-color: white;
 }
+
+#info {position:absolute;top:20px;left:1000px;}
