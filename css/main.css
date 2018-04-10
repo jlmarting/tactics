@@ -6,4 +6,4 @@ body {
     background-color: white;
 }
 
-#info {position:absolute;top:20px;left:1000px;}
+#info {position:absolute;top:20px;left:1000px;width:400px;}
