@@ -2,8 +2,20 @@ body {
     background-color: blue;
 }
 
+#container {
+   
+    width: 910px;
+    border: 2px solid red;
+}
+
 #tactics {
     background-color: white;
 }
 
-#info {position:absolute;top:20px;left:1000px;width:400px;}
+
+#info {width:898px;}
+
+#control{
+    margin: 0 auto;
+    width: 90%;
+}

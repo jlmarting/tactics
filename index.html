@@ -8,13 +8,25 @@
     <title>Tactics</title>
 </head>
 <body>
- 
-    <canvas id="tactics" width="1500" height="900">
-        <img src="img/tactics.jpg" alt="" size="50">              
-    </canvas>
-
-    <input type="text" id="info"/>  
-   
+    <div id="container">
+        <canvas id="tactics" width="900" height="500">
+            <img src="img/tactics.jpg" alt="" size="50">              
+        </canvas>
+    
+        <input type="text" id="info"/>  
+       
+    </div>
+    <div id="control">
+        <ul>
+            <li><input type="checkbox" id="lines"/><label for="lines">View Lines</label>  </li>
+            <li><input type="checkbox" id="colliders"/><label for="colliders">View Colliders</label>  </li>
+            <li><input type="checkbox" id="collision"/><label for="collision">Detect Collision</label>  </li>
+            <li><input type="checkbox" id="ids"/><label for="ids">View IDs</label>  </li>
+            <!-- <li><button id="zoomin">zoom -</button><button id="zoomout">zoom +</button></li> -->
+        </ul>
+        
+    </div>
+    
     
     <script src="lib/token.js"></script>    
     <script src="lib/scene.js"></script>
