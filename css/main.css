@@ -22,9 +22,9 @@ body {
 }
 
 #control{
-    position: absolute;
+    position: absolute;    
     top:30px;
-    left:0;
+    right:0;
     border: 1px dashed red;    
     width: 300px; 
     background: black;

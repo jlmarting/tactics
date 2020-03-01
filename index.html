@@ -13,7 +13,7 @@
             <img src="img/tactics.jpg" alt="" size="50">              
         </canvas>
 
-        <input type="text" id="info"/>  
+        <textarea id="info"> </textarea>     
     
         <div id="control">
                 <ul>
@@ -30,6 +30,16 @@
                     </li>
                     <li><input type="text" id="fps"/><label for="fps">FPS</label>  </li>
                     <li>
+                        <select id="effects">                    
+                        </select>
+                            <label for="effects">Select Bullet Effect</label>
+                    </li>
+                    <li>
+                        <select id="scene">                    
+                        </select>
+                            <label for="scenes">Select Scene</label>
+                    </li>
+                    <li>
                         <select id="tokens">                    
                         </select>
                             <label for="tokens">Select Token</label>
@@ -40,9 +50,18 @@
     </div>
 
     <script src="lib/token.js"></script>    
+    <script src="lib/tokens/image.js"></script>   
+    <script src="lib/tokens/collider.js"></script>   
+    <script src="lib/tokens/auto.js"></script> 
+    <script src="lib/tokens/shooter.js"></script>  
+    <script src="lib/tokens/vector.js"></script>    
+    <script src="lib/tokens/wire.js"></script> 
+    <script src="lib/tokens/rectangle.js"></script> 
     <script src="lib/scene.js"></script>
     <script src="lib/control.js"></script>
+    <script src="lib/editor.js"></script>
     <script src="lib/engine.js"></script>
     <script src="lib/tactics.js"></script>
+    <!--script src="lib/scenes/example1.js"></script-->
 </body>
 </html>
