@@ -1,4 +1,4 @@
-var Control = function(engine){        
+export var Control = function(engine){        
     var self = this;
     var engine = engine;
    

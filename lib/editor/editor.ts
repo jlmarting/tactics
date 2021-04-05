@@ -1,4 +1,8 @@
-const Editor = function(scene){
+import { WireToken } from '../tokens/wire';
+import { Point } from '../point/point';
+
+
+export const Editor = function(scene){
     //Puntos de trazado activos del editor
     this.points = [];  
 
@@ -73,7 +77,7 @@ const Editor = function(scene){
         p1.x = Math.round(p1.x - p0.x - scene.x);
         p1.y = Math.round(p1.y - p0.y - scene.y);
         
-        var p = new Point(p1.x,p1.y,0);            
+        var p = new Point(p1.x,p1.y);            
 
         p.id = 'P_'+e.x + '_' + e.y;
         scene.buffer.drawing.push(p);
