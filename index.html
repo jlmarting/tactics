@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,49 +8,52 @@
     <link rel="stylesheet" href="css/main.css">
     <title>Tactics</title>
 </head>
+
 <body>
     <div id="container">
         <canvas id="tactics">
-            <img src="img/tactics.jpg" alt="" size="50">              
+            <img src="img/tactics.jpg" alt="" size="50">
         </canvas>
 
-        <textarea id="info"> </textarea>     
-    
+        <textarea id="info"> </textarea>
+
         <div id="control">
-                <ul>
-                    <li><button id="stopAutomat">Stop/Go</button></li>
-                    <li><input type="checkbox" id="autoFPS"/><label for="autoFPS">Auto FPS</label>  </li>
-                    <li><input type="checkbox" id="lines"/><label for="lines">View Lines</label>  </li>
-                    <li><input type="checkbox" id="colliders"/><label for="colliders">View Colliders</label>  </li>
-                    <li><input type="checkbox" id="collision"/><label for="collision">Detect Collision</label>  </li>
-                    <li><input type="checkbox" id="ids"/><label for="ids">View IDs</label>  </li>
-                    <li><input type="checkbox" id="viewport"/><label for="viewport">Enable view clipping</label>  </li>
-                    <li>
-                        <input type="text" id="viewportwidth"/><label for="viewportwidth">Viewport Width</label>
-                        <input type="text" id="viewportheight"/><label for="viewportheight">Viewport Height</label>  
-                    </li>
-                    <li><input type="text" id="fps"/><label for="fps">FPS</label>  </li>
-                    <li>
-                        <select id="effects">                    
-                        </select>
-                            <label for="effects">Select Bullet Effect</label>
-                    </li>
-                    <li>
-                        <select id="scene">                    
-                        </select>
-                            <label for="scenes">Select Scene</label>
-                    </li>
-                    <li>
-                        <select id="tokens">                    
-                        </select>
-                            <label for="tokens">Select Token</label>
-                    </li>
-                    <li><button id="zoomin">zoom +</button><button id="zoomout">zoom -</button></li>
-                </ul>                
+            <ul>
+                <li><button id="stopAutomat">Stop/Go</button></li>
+                <li><input type="checkbox" id="autoFPS" /><label for="autoFPS">Auto FPS</label> </li>
+                <li><input type="checkbox" id="lines" /><label for="lines">View Lines</label> </li>
+                <li><input type="checkbox" id="colliders" /><label for="colliders">View Colliders</label> </li>
+                <li><input type="checkbox" id="collision" /><label for="collision">Detect Collision</label> </li>
+                <li><input type="checkbox" id="ids" /><label for="ids">View IDs</label> </li>
+                <li><input type="checkbox" id="viewport" /><label for="viewport">Enable view clipping</label> </li>
+                <li>
+                    <input type="text" id="viewportwidth" /><label for="viewportwidth">Viewport Width</label>
+                    <input type="text" id="viewportheight" /><label for="viewportheight">Viewport Height</label>
+                </li>
+                <li><input type="text" id="fps" /><label for="fps">FPS</label> </li>
+                <li>
+                    <select id="effects">
+                    </select>
+                    <label for="effects">Select Bullet Effect</label>
+                </li>
+                <li>
+                    <select id="scene">
+                    </select>
+                    <label for="scenes">Select Scene</label>
+                </li>
+                <li>
+                    <select id="tokens">
+                    </select>
+                    <label for="tokens">Select Token</label>
+                </li>
+                <li><button id="zoomin">zoom +</button><button id="zoomout">zoom -</button></li>
+            </ul>
         </div>
     </div>
 
-    <script src="built/lib/token.js"></script>    
+    <!-- <script src="built/app.js"></script> -->
+
+    <script src="built/lib/tokens/token.js"></script>    
     <script src="built/lib/tokens/image.js"></script>   
     <script src="built/lib/tokens/collider.js"></script>   
     <script src="built/lib/tokens/auto.js"></script> 
@@ -61,7 +65,8 @@
     <script src="built/lib/control.js"></script>
     <script src="built/lib/editor.js"></script>
     <script src="built/lib/engine.js"></script>
-    <script src="built/lib/tactics.js"></script>
-    <!--script src="built/lib/scenes/example1.js"></script-->
+    <script src="built/lib/tactics.js"></script> -->
+    <!--script src="built/lib/scenes/example1.js"></script
 </body>
+
 </html>

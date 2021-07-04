@@ -1,9 +1,18 @@
-var Control = (function () {
-    function Control(engine) {
+//@ts-nocheck
+
+class Control {
+
+    constructor(engine) {
         var self = this;
         var engine = engine;
+
+        //comandos disponibles
         this.moveCMD = ['left', 'right', 'up', 'down'];
         this.fireCMD = ['fire'];
+
+
+        // this.sceneCMD = ['zoomin','zoomout'];
+        //Configuración de teclas
         this.keyCommand = function (keyCode) {
             switch (keyCode) {
                 case 37: return "left";
@@ -12,20 +21,22 @@ var Control = (function () {
                 case 40: return "down";
                 case 32: return "fire";
             }
-        };
+        }
+
+        //Teclas de comando de escena
         this.keyScene = function (keyCode) {
             switch (keyCode) {
-                case 107:
-                    return "zoomin";
-                    break;
-                case 109:
-                    return "zoomout";
-                    break;
+                case 107: return "zoomin"; break;
+                case 109: return "zoomout"; break;
             }
-        };
+        }
+
+
+        //eventos de teclas    
         document.onkeydown = function (e) {
             var t = e.target;
             var cmd = self.keyCommand(e.keyCode);
+
             if (engine.mapkey.indexOf(cmd) == -1) {
                 if (self.fireCMD.indexOf(cmd) > -1) {
                     engine.mapkey.push(cmd);
@@ -35,6 +46,7 @@ var Control = (function () {
                 }
             }
         };
+
         document.onkeyup = function (e) {
             var cmd = self.keyCommand(e.keyCode);
             var index = engine.mapkey.indexOf(cmd);
@@ -42,7 +54,6 @@ var Control = (function () {
                 engine.mapkey.splice(index, 1);
             }
         };
+
     }
-    return Control;
-}());
-//# sourceMappingURL=control.js.map
+}
