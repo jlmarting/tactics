@@ -1,6 +1,7 @@
 //@ts-nocheck
-
-class Editor{
+import {WireToken} from './tokens/wire.js'
+import {Point} from './tokens/point.js'
+export class Editor{
 
 
     constructor(scene){
@@ -78,7 +79,7 @@ class Editor{
             p1.x = Math.round(p1.x - p0.x - scene.x);
             p1.y = Math.round(p1.y - p0.y - scene.y);
             
-            var p = new Point(p1.x,p1.y,0);            
+            var p = new Point(p1.x,p1.y);            
     
             p.id = 'P_'+e.x + '_' + e.y;
             scene.buffer.drawing.push(p);

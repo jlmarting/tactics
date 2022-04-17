@@ -1,6 +1,6 @@
 //@ts-nocheck
 
-class Control {
+export class Control {
 
     constructor(engine) {
         var self = this;

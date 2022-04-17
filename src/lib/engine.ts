@@ -1,6 +1,11 @@
 //@ts-nocheck
+import {AutoToken} from './tokens/auto';
+import {Shooter} from './tokens/shooter';
+import {Projectile} from './tokens/projectile';
+import {WireToken} from './tokens/wire';
 
-class Engine {
+
+export class Engine {
 
     constructor(scene) {
 
@@ -47,22 +52,26 @@ class Engine {
 
 
                 //Prueba intersección wiretoken del token seleccionado en tiempo real           
-                if ((t instanceof WireToken) && (t.id == scene.getSelectedToken().id)) {
-                    var iPoints = [];
-                    scene.buffer.intersections = [];
-                    for (var i = 0; i < scene.arrTokens.length; i++) {
-                        var element = scene.arrTokens[i];
-                        if (element instanceof WireToken) {
-                            iPoints = t.getIntersections(element);
-                        }
-                        iPoints.forEach(e => { console.log(e); scene.buffer.intersections.push(e) });
-                    }
-                    //Pasamos los vértices al mensaje de la escena
-                    scene.message = `# ${t.config.message} # ${t.id} Centro:-> [${t.x},${t.y}] Vértices: `;
-                    t.points.forEach(element => {
-                        scene.message = scene.message + `[${element.x} , ${element.y}] `;
-                    });
+                let selToken = scene.getSelectedToken();
 
+                if ((t instanceof WireToken)&&(typeof selToken != 'undefined')) {
+
+                    if (t.id == selToken.id) {
+                        var iPoints = [];
+                        scene.buffer.intersections = [];
+                        for (var i = 0; i < scene.arrTokens.length; i++) {
+                            var element = scene.arrTokens[i];
+                            if (element instanceof WireToken) {
+                                iPoints = t.getIntersections(element);
+                            }
+                            iPoints.forEach(e => { console.log(e); scene.buffer.intersections.push(e) });
+                        }
+                        //Pasamos los vértices al mensaje de la escena
+                        scene.message = `# ${t.config.message} # ${t.id} Centro:-> [${t.x},${t.y}] Vértices: `;
+                        t.points.forEach(element => {
+                            scene.message = scene.message + `[${element.x} , ${element.y}] `;
+                        });
+                    }
 
                 }
                 if (scene.buffer.intersections.length > 0) {
