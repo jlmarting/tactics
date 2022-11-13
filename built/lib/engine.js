@@ -1,3 +1,7 @@
+import { AutoToken } from './tokens/auto';
+import { Shooter } from './tokens/shooter';
+import { Projectile } from './tokens/projectile';
+import { WireToken } from './tokens/wire';
 var Engine = (function () {
     function Engine(scene) {
         this.resolver = function () {
@@ -51,20 +55,23 @@ var Engine = (function () {
                         var d = t.shot(scene.arrTokens);
                     }
                 }
-                if ((t instanceof WireToken) && (t.id == scene.getSelectedToken().id)) {
-                    var iPoints = [];
-                    scene.buffer.intersections = [];
-                    for (var i = 0; i < scene.arrTokens.length; i++) {
-                        var element = scene.arrTokens[i];
-                        if (element instanceof WireToken) {
-                            iPoints = t.getIntersections(element);
+                var selToken = scene.getSelectedToken();
+                if ((t instanceof WireToken) && (typeof selToken != 'undefined')) {
+                    if (t.id == selToken.id) {
+                        var iPoints = [];
+                        scene.buffer.intersections = [];
+                        for (var i = 0; i < scene.arrTokens.length; i++) {
+                            var element = scene.arrTokens[i];
+                            if (element instanceof WireToken) {
+                                iPoints = t.getIntersections(element);
+                            }
+                            iPoints.forEach(function (e) { console.log(e); scene.buffer.intersections.push(e); });
                         }
-                        iPoints.forEach(function (e) { console.log(e); scene.buffer.intersections.push(e); });
+                        scene.message = "# " + t.config.message + " # " + t.id + " Centro:-> [" + t.x + "," + t.y + "] V\u00E9rtices: ";
+                        t.points.forEach(function (element) {
+                            scene.message = scene.message + ("[" + element.x + " , " + element.y + "] ");
+                        });
                     }
-                    scene.message = "# " + t.config.message + " # " + t.id + " Centro:-> [" + t.x + "," + t.y + "] V\u00E9rtices: ";
-                    t.points.forEach(function (element) {
-                        scene.message = scene.message + ("[" + element.x + " , " + element.y + "] ");
-                    });
                 }
                 if (scene.buffer.intersections.length > 0) {
                     t.config.enabled = false;
@@ -75,4 +82,5 @@ var Engine = (function () {
     }
     return Engine;
 }());
+export { Engine };
 //# sourceMappingURL=engine.js.map

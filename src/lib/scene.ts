@@ -1,38 +1,202 @@
-//@ts-nocheck
-import {Point} from './tokens/point';
-import {IntersectionPoint, Effect} from './tokens/token';
-import { TText } from './tokens/token';
-import { Tile } from './tokens/token';
-import { Projectile } from './tokens/Projectile';
-import { BulletProjectile } from './tokens/token';
-import {Rectangle} from './tokens/rectangle';
-import {CursorPoint} from './tokens/cursorpoint';
-import {ImgToken} from './tokens/image';
-import {AutoToken} from './tokens/auto';
-import {Vector} from './tokens/vector';
+import { Point} from './tokens/point.js';
+import { IntersectionPoint, Effect} from './tokens/token.js';
+import { TText } from './tokens/token.js';
+import { Tile } from './tokens/token.js';
+import { Projectile } from './tokens/Projectile.js';
+import { BulletProjectile } from './tokens/token.js';
+import { Rectangle} from './tokens/rectangle.js';
+import { CursorPoint } from './tokens/cursorpoint.js';
+import { ImgToken } from './tokens/image.js';
+import { AutoToken } from './tokens/auto.js';
+import { Vector } from './tokens/vector.js';
 
 
 
-import { ColliderToken } from './tokens/collider.js';
+import { ColliderToken } from './tokens/collider';
 
-import { Shooter } from './tokens/shooter.js';
-import { WireToken } from './tokens/wire.js';
+import { Shooter } from './tokens/shooter';
+import { WireToken } from './tokens/wire';
+import { Population } from '../scenes/population.js';
+
+
+class SceneBuffer{
+    drawing: string[];
+    intersections: string[];    
+    misc: string[];
+}
+
+
+class SceneConfig{
+    effect: string;
+    grid: GridConfig;
+    viewGrid: Boolean;
+    scale: number;
+    viewColliders: Boolean;
+    viewIds: Boolean;
+    autoFPS: Boolean;
+    viewPortWidth: number;
+    viewPortHeight: number;
+};
+
+class ViewPortConfig{    
+    innerColor: string;           
+}
+
+class SceneSelector extends HTMLSelectElement {
+
+    theScene: Scene;
+
+    constructor(scene: Scene){
+        super();                
+        this.theScene = scene;
+
+    };
+
+    onchange = function(){
+        this.theScene.population.populateScene(self, this.value);
+    };
+
+    sceneSelectorLoad = function(){
+        this.population.scenes.forEach((build: string)=>{
+            let opt = document.createElement('option');
+            opt.value = build;
+            opt.text = build;
+            this.sceneSelector.appendChild(opt);
+        });
+    }
+}
+
+
+
+class ViewPort extends Rectangle{
+    scene: Scene;
+    enabled= Boolean;
+    config: ViewPortConfig;
+    attachTo(t: Point){           
+        var pos = t.getRelPos();     
+        this.scene.viewPort.placeAt(pos.x,pos.y);
+    };  
+
+    constructor(theScene: Scene){
+        super(0-(theScene.config.viewPortWidth-5/2),0-(theScene.config.viewPortHeight-5/2),viewportpoint.x,viewportpoint.y);
+        this.scene = theScene;
+        var viewportpoint = new Point(theScene.config.viewPortWidth, theScene.config.viewPortHeight);          
+    };
+}
+
+class TokenSelector extends HTMLElement {
+
+    theScene: Scene;
+    
+    constructor(scene: Scene) {                    
+        super();               
+        this.theScene = scene;     
+    };
+
+    load(){     
+        this.innerHTML = null;
+        this.theScene.arrTokens.forEach(function(t){                                    
+            if((typeof t.config!== 'undefined')&&(t.config.selectable)){
+                let opt = document.createElement('option');
+                opt.value = t.id;
+                opt.text = t.id;
+                if(t.id==this.tokenId){
+                    opt.selected= true;
+                }
+                this.appendChild(opt);
+            }
+        });
+    };
+
+
+    onchange = function(){  
+        let sel = this.value; 
+        if(this.theScene.setToken(sel)){
+            this.blur();
+        };                
+    };
+}
+
+
+
+// var viewportpoint = new Point(self.config.viewPortWidth, self.config.viewPortHeight);    
+// this.viewPort = new Rectangle(0-(self.config.viewPortWidth-5/2),0-(self.config.viewPortHeight-5/2),viewportpoint.x,viewportpoint.y);
+// this.viewPort.config = {};
+// this.viewPort.config.innerColor = null;       
+// this.viewPort.enabled =  false;    
+// this.viewPort.attachTo = function(t){   
+//     var pos = t.getRelPos();     
+//     self.viewPort.placeAt(pos.x,pos.y);
+// }
+
+
+class GridConfig{
+    height: number;
+    width: number;
+    granularity: number;
+}
+
 
 export class Scene{
+    population: Population;
+    engineInfo: string;
+    arrTokens: any[];
+    buffer: SceneBuffer;
+    arr: any[];
+    mapkey: any[];
+    drawing: boolean;
+    tokenIndex: number;
+    tokenId: any;
+    pause: boolean;
+    canvas: HTMLCanvasElement;
+    ctx: CanvasRenderingContext2D;
+    config: SceneConfig;
+    orders: any[];
+    message: string;
+    x: number;
+    y: number;
+    viewPort: Rectangle;
+    resize: () => void;
+    w: any;
+    h: any;
+    reloadSel: () => void;
+    sceneSelector: HTMLElement;
+    sceneSelectorLoad: () => void;
+    getSelectedToken: () => any;
+    autoFPS: any;
+    fps: any;
+    move: (x: any, y: any) => void;
+    centerOn: (t: any) => boolean;
+    center: () => void;
+    drawPath: () => void;
+    drawGrid: () => void;
+    render: () => number;
+    drawScene: (timeStamp: any) => void;
 
-    //scenes =  ['simple', 'general', 'linerectangle', '2lines', 'imagebrick', 'wirebrick', 'rectangles', 'textTest', 'empty']
-
+    
     constructor(canvasId: string, population: Population){    //Lo que veremos en el canvas       
         
         this.population = population;
 
         this.engineInfo = "";
         this.arrTokens = []; 
-        this.buffer = {};  // otros tokens 
-            this.buffer.drawing = [];           // buffer de dibujo: secuencia de puntos
-            this.buffer.intersections = [];     //buffer de cálculo de intersecciones de vectores
-            this.buffer.misc = []; //
+        //this.buffer = {drawing: string[] = [], insersections: [], misc: []}; 
         
+
+
+      
+        // otros tokens             
+            // this.buffer.drawing = [];           // buffer de dibujo: secuencia de puntos
+            // this.buffer.intersections = [];     //buffer de cálculo de intersecciones de vectores
+            // this.buffer.misc = []; //
+        
+        this.buffer = new SceneBuffer();
+        this.buffer.drawing = [];           // buffer de dibujo: secuencia de puntos
+        this.buffer.intersections = [];     //buffer de cálculo de intersecciones de vectores
+        this.buffer.misc = []; //
+        
+
+
         this.arr = []; //auxiliar para filtrado de tokens
         
         this.mapkey = []; //comandos que serán agregados por el control
@@ -40,11 +204,23 @@ export class Scene{
         this.tokenIndex = 0;    //indica que índice de token tenemos seleccionado para centrar vista, tomar control, etc.
         this.tokenId;           //Análogo con lo anterior. Identificador del token.
         this.pause = false;   
-        this.canvas =  document.getElementById(canvasId);   
+        
+        this.canvas = <HTMLCanvasElement> document.getElementById(canvasId);   
+
+
         this.ctx = this.canvas.getContext('2d');    
-        this.config = {viewGrid:true, scale:1, viewColliders: false, viewIds: false, autoFPS: true, viewPortWidth: 1920, viewPortHeight: 900};
+        this.config = new SceneConfig();
+        
+        this.config.grid = new GridConfig();
+        this.config.viewGrid = true;
+        this.config.scale = 11;
+        this.config.viewColliders =  false;
+        this.config.viewIds = false;
+        this.config.autoFPS = true;
+        this.config.viewPortWidth = 1920;
+        this.config.viewPortHeight = 900;
         this.config.effect = 'damage';
-        this.config.grid = {height: 0, width: 0, granularity: 50};
+        this.config.grid = new GridConfig();
     
         this.orders = []; //Pila de órdenes a ejecutar (movimientos, disparos, étc)
     
@@ -58,13 +234,16 @@ export class Scene{
         var self = this;
         var viewportpoint = new Point(self.config.viewPortWidth, self.config.viewPortHeight);    
         this.viewPort = new Rectangle(0-(self.config.viewPortWidth-5/2),0-(self.config.viewPortHeight-5/2),viewportpoint.x,viewportpoint.y);
-        this.viewPort.config = {};
-        this.viewPort.config.innerColor = null;       
-        this.viewPort.enabled =  false;    
-        this.viewPort.attachTo = function(t){   
-            var pos = t.getRelPos();     
-            self.viewPort.placeAt(pos.x,pos.y);
-        }
+
+        this.viewPort = new ViewPort(self);
+
+        // this.viewPort.config = {};
+        // this.viewPort.config.innerColor = null;       
+        // this.viewPort.enabled =  false;    
+        // this.viewPort.attachTo = function(t){   
+        //     var pos = t.getRelPos();     
+        //     self.viewPort.placeAt(pos.x,pos.y);
+        // }
     
         this.resize = function(){
             self.canvas.width =  (window.innerWidth)*1;
@@ -76,51 +255,53 @@ export class Scene{
     
         this.reloadSel = function(){
             
-            var tokenSelector = document.getElementById('tokens');
+            let tokenSelector = new TokenSelector(this);
+            
+            // tokenSelector = document.getElementById('tokens');
     
-            tokenSelector.load = function(){
-                                        tokenSelector.innerHTML = null;
+            // tokenSelector.load = function(){
+            //                             tokenSelector.innerHTML = null;
         
-                                        self.arrTokens.forEach(function(t){                                    
-                                        if((typeof t.config!== 'undefined')&&(t.config.selectable)){
-                                            var opt = document.createElement('option');
-                                            opt.value = t.id;
-                                            opt.text = t.id;
-                                            if(t.id==this.tokenId){
-                                                opt.selected="selected";
-                                            }
-                                            tokenSelector.appendChild(opt);
-                                        }
-                                    });
-                                };
+            //                             self.arrTokens.forEach(function(t){                                    
+            //                             if((typeof t.config!== 'undefined')&&(t.config.selectable)){
+            //                                 var opt = document.createElement('option');
+            //                                 opt.value = t.id;
+            //                                 opt.text = t.id;
+            //                                 if(t.id==this.tokenId){
+            //                                     opt.selected="selected";
+            //                                 }
+            //                                 tokenSelector.appendChild(opt);
+            //                             }
+            //                         });
+            //                     };
             tokenSelector.load();
     
-            tokenSelector.onchange = function(){  
-                var sel = tokenSelector.value; 
-                if(self.setToken(sel)){
-                    tokenSelector.blur();
-                };                
-            };
+            // tokenSelector.onchange = function(){  
+            //     var sel = tokenSelector.value; 
+            //     if(self.setToken(sel)){
+            //         tokenSelector.blur();
+            //     };                
+            // };
         }
        
-        this.sceneSelector = document.getElementById('scene');
+        
 
+        let sceneSelector: SceneSelector = new SceneSelector(this);
+        sceneSelector = <SceneSelector> document.getElementById('scene');
 
-        let self = this;
-
-        this.sceneSelector.onchange = function(){
-             self.population.populateScene(self, this.value);
-        }
+        // this.sceneSelector.onchange = function(){
+        //      self.population.populateScene(self, this.value);
+        // }
     
-        this.sceneSelectorLoad = function(){
-            this.population.scenes.forEach((build)=>{
-                let opt = document.createElement('option');
-                opt.value = build;
-                opt.text = build;
-                this.sceneSelector.appendChild(opt);
-            });
-                                       // sceneSelector.innerHTML = null;
-        }
+        // this.sceneSelectorLoad = function(){
+        //     this.population.scenes.forEach((build)=>{
+        //         let opt = document.createElement('option');
+        //         opt.value = build;
+        //         opt.text = build;
+        //         this.sceneSelector.appendChild(opt);
+        //     });
+        //                                // sceneSelector.innerHTML = null;
+        // }
     
         this.resize();
     
@@ -709,6 +890,9 @@ export class Scene{
             
         };
     
+    }
+    setToken(sel: any) {
+        throw new Error('Method not implemented.');
     }
 
 

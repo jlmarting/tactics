@@ -71,6 +71,7 @@ import { ColliderToken } from './collider';
 
 // } 
 export class TText{
+    draw: () => void;
     constructor(id, x, y, msg) {
         this.id = id;
         this.x = x;
@@ -97,6 +98,8 @@ export class IntersectionPoint extends Point{
 
 
 export class Tile extends Rectangle{
+    img: HTMLImageElement;
+    src: any;
     constructor(id, x, y, src, width, height) {
         super( x, y, width, height);
         this.src = src;
@@ -172,6 +175,8 @@ export class Tile extends Rectangle{
 
 //Añadimos colisionador y efecto tras impacto                            
 export class BulletProjectile extends Projectile {
+    bulletEffect: (collisions: any, bullet: any) => boolean;
+    collider: any;
     constructor(id, x, y, rad, displ) {
         super(Math.round(x), Math.round(y), rad, displ);
         this.collider = new Collider(id, Math.round(x), Math.round(y), rad, 1);

@@ -1,11 +1,12 @@
 {
   "compilerOptions": {
-    "module": "ES2020",
+    "module": "es2015",
     "noImplicitAny": true,
     "removeComments": true,
     "preserveConstEnums": true,
     "rootDir": "src",
     "outDir": "./built",
+    "allowJs": true,
     // "outFile": "./built/app.js",
     "sourceMap": true
   },

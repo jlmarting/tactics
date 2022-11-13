@@ -1,4 +1,5 @@
 .vscode/
 /.vscode
-**/*.map
-**/*.js
+**/node_modules/
+"built/**/*",
+"**/*.spec.ts"

@@ -11,6 +11,7 @@ export class ColliderToken extends ImgToken {
 
     health: number;
     config: Config;
+    collider: any;
 
     constructor(id, x, y, rad, src, w, h) {
         super(id, x, y, rad, src, w, h);

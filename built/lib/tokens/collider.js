@@ -1,33 +1,66 @@
-var ColliderToken = function (id, x, y, rad, src, w, h) {
-    ImgToken.call(this, id, x, y, rad, src, w, h);
-    this.collider = new Collider(id, x, y, rad, w / 2);
-    this.health = 1000;
-};
-ColliderToken.prototype = Object.create(ImgToken.prototype);
-ColliderToken.prototype.placeAt = function (x, y) {
-    Point.prototype.placeAt.call(this, Math.round(x), Math.round(y));
-};
-ColliderToken.prototype.move = function (cmd, displ, tokens) {
-    var colliderMovePromise = function (cmd, displ, tokens) {
-        return new Promise(function (resolve, reject) {
-            var moveResult = Collider.prototype.move.call(this.collider, cmd, displ, tokens);
-            resolve(moveResult);
-        }.bind(this));
-    }.bind(this);
-    colliderMovePromise(cmd, displ, tokens).then(function (moveResult) {
-        if (moveResult.canMove) {
-            ImgToken.prototype.move.call(this, cmd, displ);
-        }
-    }.bind(this));
-};
-var Collider = function (id, x, y, rad, cradius) {
-    CursorPoint.call(this, x, y, rad);
-    this.id = id;
-    this.radius = cradius;
-    this.subColliders = [];
-    this.config = { enabled: true, visible: true, innerColor: "rgba(255, 255, 15, 0.60)", borderColor: "magenta", borderWidth: 5 };
-    this.back = [];
-};
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+import { CursorPoint } from './cursorpoint.js';
+import { ImgToken } from './image.js';
+var Config = (function () {
+    function Config() {
+    }
+    return Config;
+}());
+var ColliderToken = (function (_super) {
+    __extends(ColliderToken, _super);
+    function ColliderToken(id, x, y, rad, src, w, h) {
+        var _this = _super.call(this, id, x, y, rad, src, w, h) || this;
+        _this.placeAt = function (x, y) {
+            Point.prototype.placeAt.call(this, Math.round(x), Math.round(y));
+        };
+        _this.move = function (cmd, displ, tokens) {
+            var colliderMovePromise = function (cmd, displ, tokens) {
+                return new Promise(function (resolve, reject) {
+                    var moveResult = Collider.prototype.move.call(this.collider, cmd, displ, tokens);
+                    resolve(moveResult);
+                }.bind(this));
+            }.bind(this);
+            colliderMovePromise(cmd, displ, tokens).then(function (moveResult) {
+                if (moveResult.canMove) {
+                    ImgToken.prototype.move.call(this, cmd, displ);
+                }
+            }.bind(this));
+        };
+        _this.collider = new Collider(id, x, y, rad, w / 2);
+        _this.health = 1000;
+        return _this;
+    }
+    return ColliderToken;
+}(ImgToken));
+export { ColliderToken };
+var Collider = (function (_super) {
+    __extends(Collider, _super);
+    function Collider(id, x, y, rad, cradius) {
+        var _this = this;
+        CursorPoint.call(_this, x, y, rad);
+        _this.id = id;
+        _this.radius = cradius;
+        _this.subColliders = [];
+        _this.config = { enabled: true, visible: true, innerColor: "rgba(255, 255, 15, 0.60)", borderColor: "magenta", borderWidth: 5 };
+        _this.back = [];
+        return _this;
+    }
+    return Collider;
+}(CursorPoint));
 Collider.prototype = Object.create(CursorPoint.prototype);
 Collider.prototype.addSubCollider = function () {
     var id = this.id + '_sc_' + this.subColliders.length;

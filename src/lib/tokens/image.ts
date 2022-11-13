@@ -3,6 +3,8 @@ import {Point} from './point.js'
 import {CursorPoint} from './cursorpoint.js'
 //Token vinculado a una imagen
 export class ImgToken extends CursorPoint{
+    img: HTMLImageElement;
+    src: any;
 
     constructor(id,x,y,rad,src,width,height){
         super(x,y,rad);    

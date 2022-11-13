@@ -1,5 +1,17 @@
+import { Point } from './tokens/point';
+import { IntersectionPoint } from './tokens/token';
+import { TText } from './tokens/token';
+import { Tile } from './tokens/token';
+import { Projectile } from './tokens/Projectile';
+import { BulletProjectile } from './tokens/token';
+import { Rectangle } from './tokens/rectangle';
+import { CursorPoint } from './tokens/cursorpoint';
+import { ImgToken } from './tokens/image';
+import { Vector } from './tokens/vector';
+import { ColliderToken } from './tokens/collider';
 var Scene = (function () {
-    function Scene(canvasId, arrBuilds) {
+    function Scene(canvasId, population) {
+        this.population = population;
         this.engineInfo = "";
         this.arrTokens = [];
         this.buffer = {};
@@ -47,7 +59,7 @@ var Scene = (function () {
                         var opt = document.createElement('option');
                         opt.value = t.id;
                         opt.text = t.id;
-                        if (t.id == theScene.tokenId) {
+                        if (t.id == this.tokenId) {
                             opt.selected = "selected";
                         }
                         tokenSelector.appendChild(opt);
@@ -63,9 +75,19 @@ var Scene = (function () {
                 ;
             };
         };
-        var sceneSelector = document.getElementById('scene');
-        sceneSelector.load = function () {
-            sceneSelector.innerHTML = null;
+        this.sceneSelector = document.getElementById('scene');
+        var self = this;
+        this.sceneSelector.onchange = function () {
+            self.population.populateScene(self, this.value);
+        };
+        this.sceneSelectorLoad = function () {
+            var _this = this;
+            this.population.scenes.forEach(function (build) {
+                var opt = document.createElement('option');
+                opt.value = build;
+                opt.text = build;
+                _this.sceneSelector.appendChild(opt);
+            });
         };
         this.resize();
         window.onresize = function () { self.resize(); };
@@ -74,13 +96,14 @@ var Scene = (function () {
         };
         this.setToken = function (tokenId) {
             self.tokenIndex = self.arrTokens.findIndex(function (element) {
+                console.log("tokenId[" + tokenId + "] setToken.tokenIndex -> " + self.tokenIndex);
                 return element.id == tokenId;
             });
             if (self.tokenIndex > -1) {
                 self.tokenId = tokenId;
             }
             else {
-                console.log('No se ha encontrado nada');
+                console.log('No se ha encontrado token a asignar..........');
                 return false;
             }
             self.viewPort.attachTo(self.arrTokens[self.tokenIndex]);
@@ -164,17 +187,6 @@ var Scene = (function () {
                 };
                 var bulletEffect = document.getElementById('effects');
                 bulletEffect.load = function () {
-                    bulletEffect.innerHTML = null;
-                    var prop = Object.keys(Effects);
-                    prop.forEach(function (e) {
-                        var opt = document.createElement('option');
-                        opt.value = e;
-                        opt.text = e;
-                        bulletEffect.appendChild(opt);
-                        if (opt.value == self.config.effect) {
-                            opt.selected = "selected";
-                        }
-                    });
                 };
                 bulletEffect.addEventListener('click', function () {
                     bulletEffect.load();
@@ -193,7 +205,7 @@ var Scene = (function () {
                             var opt = document.createElement('option');
                             opt.value = t.id;
                             opt.text = t.id;
-                            if (t.id == theScene.tokenId) {
+                            if (t.id == self.tokenId) {
                                 opt.selected = "selected";
                             }
                             tokenSelector.appendChild(opt);
@@ -500,4 +512,5 @@ var Scene = (function () {
     }
     return Scene;
 }());
+export { Scene };
 //# sourceMappingURL=scene.js.map

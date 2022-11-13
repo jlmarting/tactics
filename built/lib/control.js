@@ -45,4 +45,5 @@ var Control = (function () {
     }
     return Control;
 }());
+export { Control };
 //# sourceMappingURL=control.js.map

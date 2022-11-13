@@ -4,6 +4,9 @@ import {Point} from './point.js'
 import { IntersectionPoint } from './token.js';
 
 export class Vector{
+    id: string;
+    a: Point;
+    b: Point;
 
     constructor(id,x0,y0,x1,y1){
         this.id = id;

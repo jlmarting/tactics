@@ -1,3 +1,5 @@
+import { WireToken } from './tokens/wire.js';
+import { Point } from './tokens/point.js';
 var Editor = (function () {
     function Editor(scene) {
         this.points = [];
@@ -47,7 +49,7 @@ var Editor = (function () {
             var p1 = new Point(e.x, e.y);
             p1.x = Math.round(p1.x - p0.x - scene.x);
             p1.y = Math.round(p1.y - p0.y - scene.y);
-            var p = new Point(p1.x, p1.y, 0);
+            var p = new Point(p1.x, p1.y);
             p.id = 'P_' + e.x + '_' + e.y;
             scene.buffer.drawing.push(p);
             this.last = p;
@@ -56,4 +58,5 @@ var Editor = (function () {
     }
     return Editor;
 }());
+export { Editor };
 //# sourceMappingURL=editor.js.map
