@@ -1,0 +1,87 @@
+{
+"card_list":[
+				{
+					"name":"El descubrimiento del 1er fosil humano",
+					"img":"card1.jpg",
+					"year":1830,
+					"description":""
+				},
+				{
+					"name":"El descubrimiento de los pulsares",
+					"img":"card1.jpg",
+					"year":1967,
+					"description":""
+				},
+				{
+					"name":"La guerra de los cien años (fin)",
+					"nota":"fin",
+					"img":"card1.jpg",
+					"year":1453,
+					"description":"La guerra de los Cien Años fue un conflicto armado que duró casi 117 años (1 de enero de 1337-17 de octubre de 1453) ​entre los reinos de Francia e Inglaterra. Su propósito era resolver quién controlaría las enormes posesiones acumuladas por los monarcas ingleses desde 1154 en territorios franceses, debido al ascenso al trono inglés de Enrique II Plantagenet, conde de Anjou. Tuvo implicaciones internacionales y finalmente, después de numerosos avatares, se saldó con la retirada inglesa de tierras francesas."
+				},
+				{
+					"name":"La 1a fotografia en un periodico",
+					"img":"card1.jpg",
+					"year":1880,
+					"description":""
+				},
+				{
+					"name":"El descubrimiento del panda gigante (por los europeos)",
+					"nota":"por los europeos",
+					"img":"card1.jpg",
+					"year":1869,
+					"description":""
+				},
+				{
+					"name":"El descubrimiento de las ruinas de Pompeya",
+					"img":"card1.jpg",
+					"year":1592,
+					"description":""
+				},
+				{
+					"name":"El descubrimiento del cometa Halley",
+					"img":"card1.jpg",
+					"year":1682,
+					"description":""
+				},
+				{
+					"name":"El descubrimiento de Angkor Wat (por los europeos)",
+					"nota":"por los europeos",
+					"img":"card1.jpg",
+					"year":1861,
+					"description":"es el templo hinduista más grande y también el mejor conservado de los que integran el asentamiento de Angkor. Está considerado como la mayor estructura religiosa jamás construida,1​ y uno de los tesoros arqueológicos más importantes del mundo.Redescubierto a finales del siglo XIX por el naturalista francés Henri Mouhot"
+				},
+				{
+					"name":"La invención de la insulina",
+					"img":"card1.jpg",
+					"year":1921,
+					"description":""
+				},
+				{
+					"name":"El cálculo de la distancia entre la Tierra y la Luna",
+					"img":"card1.jpg",
+					"year":-150,
+					"description":"El primero en calcular la distancia a la Luna fue el griego Aristarco de Samos (320-250 a. C.), y tomó los datos durante un eclipse lunar. La curva de la sombra de la Tierra sobre la Luna le dio los datos."
+				},
+				{
+					"name":"El descubrimiento de la isla de Pascua (por los europeos)",
+					"nota":"por los europeos",
+					"img":"card1.jpg",
+					"year":1722,
+					"description":"El primer contacto europeo documentado con la isla corresponde al realizado por el holandés Jacob Roggeveen en 1722"
+				},
+				{
+					"name":"Primera Guerra Mundial (inicio)",
+					"nota":"inicio",
+					"img":"card1.jpg",
+					"year":1914,
+					"description":""
+				},
+				{
+					"name":"Julio Cesar es nombrado dictador vitalicio",
+					"img":"card1.jpg",
+					"year":-44,
+					"description":""
+				}
+			]
+} 

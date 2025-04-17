@@ -1,0 +1,30 @@
+import { ColliderToken } from "./collidertoken.js";
+import { BulletProjectile } from "./bulletprojectile.js";
+export class Shooter extends ColliderToken {
+    constructor(id, x, y, rad, src, width, height) {
+        super(id, x, y, rad, src, width, height);
+        this.rad = rad;
+        this.reloading = false;
+        this.bulletCount = 2000;
+        this.startTime = 0;
+    }
+    shot() {
+        const SHOT_LAPSE = 90;
+        const SHOT_DISPLACEMENT = 8;
+        if ((this.reloading == true) || (this.bulletCount == 0))
+            return null;
+        var xy = this.getCenter();
+        var dist = 65;
+        xy.x = xy.x + Math.cos(this.rad) * dist;
+        xy.y = xy.y + Math.sin(this.rad) * dist;
+        var bullet = new BulletProjectile(this.id, (xy.x), (xy.y), this.rad, SHOT_DISPLACEMENT);
+        bullet.id = this.id + '_' + this.bulletCount;
+        ;
+        this.bulletCount--;
+        this.reloading = true;
+        var shooter = this;
+        setTimeout(function () { shooter.reloading = false; }, SHOT_LAPSE);
+        return bullet;
+    }
+}
+//# sourceMappingURL=shooter.js.map

@@ -1,33 +1,16 @@
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        if (typeof b !== "function" && b !== null)
-            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-import { Point } from './point.js';
+import { Point2D } from "./components/point2d.js";
 import { CursorPoint } from './cursorpoint.js';
-var ImgToken = (function (_super) {
-    __extends(ImgToken, _super);
-    function ImgToken(id, x, y, rad, src, width, height) {
-        var _this = _super.call(this, x, y, rad) || this;
-        _this.id = id;
-        _this.idColor = 'red';
-        _this.src = src;
-        _this.w = width;
-        _this.h = height;
-        _this.config = { viewName: false, selectable: false, position: 'relative' };
-        return _this;
+export class ImgToken extends CursorPoint {
+    constructor(id, x, y, rad, src, width, height) {
+        super(x, y, rad);
+        this.id = id;
+        this.idColor = 'red';
+        this.src = src;
+        this.w = width;
+        this.h = height;
+        this.config = { viewName: false, selectable: false, position: 'relative' };
     }
-    ImgToken.prototype.draw = function (ctx) {
+    draw(ctx) {
         if (ctx) {
             var pos;
             if (this.config.position == 'relative') {
@@ -62,7 +45,7 @@ var ImgToken = (function (_super) {
                 return 1;
             }
             else {
-                var p = new Point(this.x, this.y);
+                var p = new Point2D(this.x, this.y);
                 ;
                 p.draw();
                 return 1;
@@ -71,17 +54,15 @@ var ImgToken = (function (_super) {
         else {
             return -1;
         }
-    };
+    }
     ;
-    ImgToken.prototype.getCenter = function () {
+    getCenter() {
         return { "x": this.x, "y": this.y };
-    };
-    ImgToken.prototype.move = function (cmd, displ) {
+    }
+    move(cmd, displ) {
         var dXY = CursorPoint.prototype.move.call(this, cmd, displ);
         return dXY;
-    };
+    }
     ;
-    return ImgToken;
-}(CursorPoint));
-export { ImgToken };
+}
 //# sourceMappingURL=image.js.map

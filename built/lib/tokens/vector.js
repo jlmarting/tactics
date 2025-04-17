@@ -1,13 +1,13 @@
-import { Point } from './point.js';
-import { IntersectionPoint } from './token.js';
-var Vector = (function () {
-    function Vector(id, x0, y0, x1, y1) {
+import { Point2D } from './components/point2d.js';
+import { IntersectionPoint } from './intersectionpoint.js';
+export class Vector {
+    constructor(id, x0, y0, x1, y1) {
         this.id = id;
-        this.a = new Point(x0, y0);
-        this.b = new Point(x1, y1);
+        this.a = new Point2D(x0, y0);
+        this.b = new Point2D(x1, y1);
         this.config = { color: 'green' };
     }
-    Vector.prototype.draw = function (ctx) {
+    draw(ctx) {
         this.a = this.a.getRelPos();
         this.b = this.b.getRelPos();
         ctx.beginPath();
@@ -15,8 +15,8 @@ var Vector = (function () {
         ctx.strokeStyle = this.config.color;
         ctx.lineTo(this.b.x, this.b.y);
         ctx.stroke();
-    };
-    Vector.prototype.inRangeX = function (p) {
+    }
+    inRangeX(p) {
         if ((p.x <= this.a.x) && (p.x >= this.b.x)) {
             return true;
         }
@@ -24,8 +24,8 @@ var Vector = (function () {
             return true;
         }
         return false;
-    };
-    Vector.prototype.inRangeY = function (p) {
+    }
+    inRangeY(p) {
         if ((p.y <= this.a.y) && (p.y >= this.b.y)) {
             return true;
         }
@@ -33,11 +33,11 @@ var Vector = (function () {
             return true;
         }
         return false;
-    };
-    Vector.prototype.inRange = function (p) {
+    }
+    inRange(p) {
         return this.inRangeX(p) && this.inRangeY(p);
-    };
-    Vector.prototype.intersection = function (v) {
+    }
+    intersection(v) {
         var id1 = this.id.split('_')[0];
         var id2 = v.id.split('_')[0];
         if (id1 == id2) {
@@ -61,7 +61,7 @@ var Vector = (function () {
             var p = new IntersectionPoint(Math.round(x), Math.round(y), this);
             if ((this.inRange(p)) && (v.inRange(p))) {
                 p.tokens.push(v);
-                console.log("* recta 0 vertical --> x:" + x + " y:" + y + "   m0:" + m0 + "  m1:" + m1);
+                console.log(`* recta 0 vertical --> x:${x} y:${y}   m0:${m0}  m1:${m1}`);
                 return p;
             }
         }
@@ -72,7 +72,7 @@ var Vector = (function () {
             if (x < v.a.x) {
                 if ((this.inRange(p)) && (v.inRange(p))) {
                     p.tokens.push(v);
-                    console.log("* recta 1 vertical --> x:" + x + " y:" + y + "   m0:" + m0 + "  m1:" + m1);
+                    console.log(`* recta 1 vertical --> x:${x} y:${y}   m0:${m0}  m1:${m1}`);
                     return p;
                 }
                 else {
@@ -86,7 +86,7 @@ var Vector = (function () {
             var p = new IntersectionPoint(Math.round(x), Math.round(y), this);
             if ((this.inRange(p)) && (v.inRange(p))) {
                 p.tokens.push(v);
-                console.log("* recta 0 horizontal --> x:" + x + " y:" + y + "   m0:" + m0 + "  m1:" + m1);
+                console.log(`* recta 0 horizontal --> x:${x} y:${y}   m0:${m0}  m1:${m1}`);
                 return;
             }
         }
@@ -96,25 +96,23 @@ var Vector = (function () {
             var p = new IntersectionPoint(Math.round(x), Math.round(y));
             if ((this.inRange(p)) && (v.inRange(p))) {
                 p.tokens.push(v);
-                console.log("* recta 1 horizontal --> x:" + x + " y:" + y + "   m0:" + m0 + "  m1:" + m1);
+                console.log(`* recta 1 horizontal --> x:${x} y:${y}   m0:${m0}  m1:${m1}`);
                 return p;
             }
         }
         x = (b1 - b0) / (m0 - m1);
         y = (m0 * x) + b0;
         if (!isFinite(x) || !isFinite(y)) {
-            console.log(" infinitos --> x:" + x + " y:" + y + "   m0:" + m0 + "  m1:" + m1);
+            console.log(` infinitos --> x:${x} y:${y}   m0:${m0}  m1:${m1}`);
             return null;
         }
         var p = new IntersectionPoint(Math.round(x), Math.round(y));
         if ((this.inRange(p)) && (v.inRange(p))) {
             p.tokens.push(v);
-            console.log("* Rectas no notables x:" + x + " y:" + y + "   m0:" + m0 + "  m1:" + m1);
+            console.log(`* Rectas no notables x:${x} y:${y}   m0:${m0}  m1:${m1}`);
             return p;
         }
         return null;
-    };
-    return Vector;
-}());
-export { Vector };
+    }
+}
 //# sourceMappingURL=vector.js.map
