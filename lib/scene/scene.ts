@@ -6,27 +6,53 @@ import { Effects } from '../projectile/effects';
 import { IToken } from '../tokens/itoken';
 import { ViewPort } from './viewport';
 
+/**
+ * Clase Scene: Gestiona el renderizado (draw loop), el estado de la cámara (ViewPort)
+ * y la integración con la interfaz de usuario (DOM).
+ */
 export class Scene {
+    /** Información de depuración del motor. */
     engineInfo: string;
+    /** Lista principal de objetos de juego presentes en la escena. */
     arrTokens: any[];
+    /** Buffers temporales para dibujo auxiliar, intersecciones y otros elementos visuales. */
     buffer: { drawing: any[], intersections: any[], misc: any[] };
+    /** Tokens que se renderizarán en el frame actual (filtrados por viewport). */
     arr: any[];
+    /** Comandos activos (duplicado del motor para referencia). */
     mapkey: any[];
+    /** Estado de ejecución del renderizado. */
     drawing: boolean;
+    /** Índice del token seleccionado actualmente (foco de la cámara y control). */
     tokenIndex: number;
+    /** Identificador del token seleccionado. */
     tokenId: string | null;
+    /** Estado de pausa del motor. */
     pause: boolean;
+    /** Referencia al elemento Canvas del DOM. */
     canvas: HTMLCanvasElement;
+    /** Contexto de dibujo 2D del Canvas. */
     ctx: CanvasRenderingContext2D;
+    /** Pila de órdenes pendientes. */
     orders: any[];
+    /** Mensaje de texto informativo para mostrar en la UI. */
     message: string;
+    /** Desplazamiento X global de la escena (cámara). */
     x: number;
+    /** Desplazamiento Y global de la escena (cámara). */
     y: number;
+    /** Gestor de la ventana de visualización y clipping. */
     viewPort: ViewPort;
+    /** Ancho del canvas. */
     w: number;
+    /** Alto del canvas. */
     h: number;
+    /** Flag para ajuste automático de FPS. */
     autoFPS: boolean;
+    /** FPS configurados/objetivo. */
     fps: number;
+
+    /** Configuración general de visualización de la escena. */
     config: {
         viewGrid: boolean;
         scale: number;
@@ -39,6 +65,9 @@ export class Scene {
         grid: { height: number, width: number, granularity: number }
     };
 
+    /**
+     * @param canvasId ID del elemento <canvas> en el HTML.
+     */
     constructor(canvasId: string) {
         this.engineInfo = "";
         this.arrTokens = [];
@@ -87,10 +116,16 @@ export class Scene {
 
         this.viewPort = new ViewPort(0, 0, this.config.viewPortWidth, this.config.viewPortHeight);
 
+        // Ajustar canvas al redimensionar ventana
         window.onresize = () => this.resize();
+
+        // Enlazar el ciclo de dibujo
         this.drawScene = this.drawScene.bind(this);
     }
 
+    /**
+     * Restablece la configuración por defecto.
+     */
     defaultConfig() {
         this.config.viewGrid = true;
         this.config.scale = 1;
@@ -103,9 +138,33 @@ export class Scene {
         this.config.grid = { height: 0, width: 0, granularity: 50 };
     }
 
+    /**
+     * Posición inicial de la cámara.
+     */
     defaultPosition() {
         this.x = 500;
         this.y = 500;
+    }
+
+    /**
+     * Actualiza las dimensiones del canvas según la ventana del navegador.
+     */
+    reloadSel() {
+        const tokenSelector = document.getElementById('tokens') as HTMLSelectElement;
+        if (!tokenSelector) return;
+
+        tokenSelector.innerHTML = '';
+        this.arrTokens.forEach((t) => {
+            if (t.config && t.config.selectable) {
+                const opt = document.createElement('option');
+                opt.value = t.id;
+                opt.text = t.id;
+                if (t.id === this.tokenId) {
+                    opt.selected = true;
+                }
+                tokenSelector.appendChild(opt);
+            }
+        });
     }
 
     resize() {
@@ -115,6 +174,9 @@ export class Scene {
         this.h = this.canvas.height;
     }
 
+    /**
+     * Carga las imágenes de todos los tokens que tengan una ruta 'src' definida.
+     */
     loadImg() {
         this.arrTokens.forEach((t) => {
             if (t instanceof ImgToken) {
@@ -127,8 +189,16 @@ export class Scene {
         });
     }
 
+    /**
+     * Método principal de renderizado (un frame).
+     * 1. Limpia el canvas.
+     * 2. Aplica escala (zoom).
+     * 3. Filtra y dibuja tokens, colisionadores y rejilla.
+     */
     render() {
         const scale = this.config.scale;
+
+        // Limpieza total del canvas
         this.ctx.save();
         this.ctx.setTransform(1, 0, 0, 1, 0, 0);
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -139,6 +209,7 @@ export class Scene {
         this.ctx.save();
         this.ctx.scale(scale, scale);
 
+        // Selección y clipping: solo procesamos lo que está en el viewport
         if (this.viewPort.enabled) {
             this.arr = [];
             const allTokens = [...this.arrTokens, ...this.buffer.drawing, ...this.buffer.intersections];
@@ -146,33 +217,29 @@ export class Scene {
             if (selected) {
                 this.viewPort.attachTo(selected);
             }
-            allTokens.forEach(e => {
-                const p = e.getRelPos ? e.getRelPos() : { x: e.x, y: e.y };
-                // Simple inclusion check
-                this.arr.push(e);
-            });
+            // TODO: Implementar lógica de filtrado real por ViewPort
+            this.arr = allTokens;
         } else {
             this.arr = [...this.arrTokens, ...this.buffer.drawing, ...this.buffer.intersections];
         }
 
+        // Dibujo de cada token
         this.arr.forEach((t) => {
-            if (t.destroy) {
-                // destruct
-            } else {
+            if (!t.destroy) {
                 if (typeof t.draw === 'function') {
+                    // Pasamos el offset (x, y) que representa la cámara
                     t.draw(this.ctx, undefined, undefined, { x: this.x, y: this.y });
                 }
             }
+            // Dibujo auxiliar de colisionadores si está habilitado
             if (this.config.viewColliders && t.collider) {
-                t.collider.draw(this.ctx);
+                t.collider.draw(this.ctx, undefined, undefined, { x: this.x, y: this.y });
             }
         });
 
+        // Dibujo de la rejilla de fondo
         if (this.config.viewGrid) {
             this.drawGrid();
-        }
-        if (this.viewPort.enabled) {
-            // this.viewPort.draw(this.ctx);
         }
 
         this.ctx.restore();
@@ -182,16 +249,22 @@ export class Scene {
     private lastTime = window.performance.now();
     private arrIntervals: number[] = [];
 
+    /**
+     * Ciclo de dibujo mediante requestAnimationFrame.
+     * Gestiona el timing, el cálculo de FPS y la actualización de la UI.
+     */
     drawScene(timeStamp: number) {
         const now = window.performance.now();
         const elapsed = now - this.lastTime;
 
+        // Control de refresco según FPS configurados
         if (elapsed >= 1000 / this.fps) {
-            this.center();
-            this.render();
+            this.center(); // Centrar cámara en el token activo
+            this.render(); // Dibujar frame
             this.lastTime = now;
         }
 
+        // Medición de rendimiento (FPS reales)
         this.arrIntervals.push(now);
         if (this.arrIntervals.length > 40) this.arrIntervals.shift();
 
@@ -205,11 +278,13 @@ export class Scene {
         }
         const realFPS = averageInterval > 0 ? Math.round(1000 / averageInterval) : 0;
 
+        // Lógica de Auto-FPS: Ajusta la carga si el rendimiento cae
         if (this.config.autoFPS) {
             if (averageInterval > 22 && this.fps > 1) this.fps = Math.round(this.fps / 1.1);
             if (averageInterval < 17 && this.fps < 60) this.fps++;
         }
 
+        // Actualización de la caja de texto informativa en el HTML
         const infoElem = document.getElementById('info');
         if (infoElem instanceof HTMLTextAreaElement) {
             infoElem.value = `TOKENS(TOTAL/DRAWED): [${this.arrTokens.length} / ${this.arr.length}] FPS(config/real): [${this.fps} / ${realFPS}]\n` +
@@ -219,10 +294,16 @@ export class Scene {
         requestAnimationFrame(this.drawScene);
     }
 
+    /**
+     * Centra la cámara en el token seleccionado.
+     */
     center() {
         this.centerOn(this.arrTokens[this.tokenIndex]);
     }
 
+    /**
+     * Calcula el desplazamiento X, Y para centrar un token en el canvas.
+     */
     centerOn(t: IToken) {
         if (!t) return;
         const scale = this.config.scale;
@@ -230,6 +311,9 @@ export class Scene {
         this.y = (this.h / (2 * scale)) - t.y;
     }
 
+    /**
+     * Dibuja una rejilla infinita de referencia sobre el mapa.
+     */
     drawGrid() {
         this.ctx.save();
         this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
@@ -237,14 +321,18 @@ export class Scene {
         const gran = this.config.grid.granularity;
         const gridW = 1900;
         const gridH = 1200;
+
+        // Cálculo de alineación de la rejilla para que parezca estática mientras nos movemos
         const dx = (Math.round((this.x - gridW / 2) / gran) * gran) + (gridW / 2);
         const dy = (Math.round((this.y - gridH / 2) / gran) * gran) + (gridH / 2);
+
         for (let col = 0; col <= Math.round(gridW / gran); col++) {
             for (let row = 0; row <= Math.round(gridH / gran); row++) {
                 const x = (col * gran) - dx;
                 const y = (row * gran) - dy;
                 const rx = x + this.x;
                 const ry = y + this.y;
+
                 if ((x % (gran * 5) === 0) && (y % (gran * 5) === 0)) {
                     this.ctx.fillStyle = 'green';
                     this.ctx.fillRect(rx, ry, 5, 5);
@@ -258,6 +346,9 @@ export class Scene {
         this.ctx.restore();
     }
 
+    /**
+     * Selecciona un token por su ID y actualiza los controles de la UI asociados.
+     */
     setToken(tokenId: string) {
         const index = this.arrTokens.findIndex(t => t.id === tokenId);
         if (index > -1) {
@@ -272,6 +363,9 @@ export class Scene {
         return false;
     }
 
+    /**
+     * Vincula los elementos HTML (checkboxes, botones) con las propiedades de la escena.
+     */
     private setupUIControls() {
         const getElem = (id: string) => document.getElementById(id);
 
@@ -315,6 +409,9 @@ export class Scene {
         }
     }
 
+    /**
+     * Obtiene el token que tiene actualmente el foco.
+     */
     getSelectedToken() {
         return this.arrTokens[this.tokenIndex];
     }

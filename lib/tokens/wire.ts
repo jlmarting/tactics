@@ -95,6 +95,25 @@ export class WireToken extends CursorPoint {
         }
     }
 
+    /**
+     * Calcula el centro geométrico del polígono basado en el promedio de sus vértices
+     * y actualiza la posición del token.
+     */
+    setCenter() {
+        if (this.points.length === 0) return;
+
+        let sX = 0;
+        let sY = 0;
+        this.points.forEach(p => {
+            sX += p.x;
+            sY += p.y;
+        });
+
+        // Punto central promedio
+        this.x = Math.round(sX / this.points.length);
+        this.y = Math.round(sY / this.points.length);
+    }
+
     getVectors() {
         const vectors = [];
         for (let i = 0; i < this.points.length; i++) {
