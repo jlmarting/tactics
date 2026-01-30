@@ -3,61 +3,52 @@ import { WireToken } from './wire';
 import { Collider } from './collider';
 import { Point } from '../point/point';
 
-//x,y: coordenadas centro, w,h:width, height
-export const Rectangle = function(x,y,w,h){
-    CursorPoint.call(this,x,y,0);
-    this.w=w;
-    this.h=h;
-    this.wire = new WireToken("wire_" + this.id, x, y);
-    //this.wire.load(new CursorPoint(x,y,0));
-    this.wire.load(new CursorPoint(x+w/2, y+h/2,0));
-    this.wire.load(new CursorPoint(x+w/2,y-h/2,0));
-    this.wire.load(new CursorPoint(x-w/2, y-h/2,0));
-    this.wire.load(new CursorPoint(x+w/2,y+h/2,0));
-}
+export class Rectangle extends CursorPoint {
+    w: number;
+    h: number;
+    wire: WireToken;
 
-Rectangle.prototype.placeAt = function(x,y){
-    CursorPoint.prototype.placeAt.call(this,x,y);
-}
-
-Rectangle.prototype.isCollisioning = function(otherElement){
-    if(otherElement instanceof Rectangle == true){
-        var intersections = this.wire.getIntersections(otherElement.wire);
-        if(intersections.length > 0){
-            return true;
-        }else{
-            return false;
-        }
-    }else{
-        if(s instanceof Collider == true){
-            //TODO colisión con Collider
-            return false;
-        }else{
-            return false;
-        }
+    constructor(x: number, y: number, w: number, h: number) {
+        super(x, y, 0);
+        this.w = w;
+        this.h = h;
+        this.wire = new WireToken("wire_" + this.id, this);
+        this.wire.load(new Point(x + w / 2, y + h / 2));
+        this.wire.load(new Point(x + w / 2, y - h / 2));
+        this.wire.load(new Point(x - w / 2, y - h / 2));
+        this.wire.load(new Point(x + w / 2, y + h / 2));
     }
-}
 
-Rectangle.prototype.isInside = function(x,y){
-    var rw = Math.round(this.w/2);
-    var rh = Math.round(this.h/2);
-    return !((x < this.x-rw)||(x > this.x+rw)||(y < this.y-rh)||(y > this.y+rh))
-}
+    placeAt(x: number, y: number) {
+        super.placeAt(x, y);
+    }
 
-Rectangle.prototype.move =  function(cmd){    
-    var dXY = CursorPoint.prototype.move.call(this,cmd,5);
-    console.log('rectangle move ' + cmd + ' ' + dXY.x + ' ' + dXY.y);  
-    this.wire.move(cmd,5);
-    return dXY;
-};    
+    isCollisioning(otherElement: any): boolean {
+        if (otherElement instanceof Rectangle) {
+            const intersections = this.wire.getIntersections(otherElement.wire);
+            return intersections.length > 0;
+        } else if (otherElement instanceof Collider) {
+            // TODO: colisión con Collider
+            return false;
+        }
+        return false;
+    }
 
+    isInside(x: number, y: number): boolean {
+        const rw = Math.round(this.w / 2);
+        const rh = Math.round(this.h / 2);
+        return !((x < this.x - rw) || (x > this.x + rw) || (y < this.y - rh) || (y > this.y + rh));
+    }
 
+    move(cmd: string, displ: number = 5): any {
+        const dXY = super.move(cmd, displ);
+        console.log('rectangle move ' + cmd + ' ' + dXY.x + ' ' + dXY.y);
+        this.wire.move(cmd, displ);
+        return dXY;
+    }
 
-Rectangle.prototype.getRelPos = function(){
-    return Point.prototype.getRelPos.call(this,this.x,this.y);
-}
-
-Rectangle.prototype.draw = function(ctx,lColor,fColor){
-    Point.prototype.draw.call(ctx);           
-    this.wire.draw(ctx);     
+    draw(ctx: CanvasRenderingContext2D, lColor?: string, fColor?: string, offset?: { x: number, y: number }) {
+        super.draw(ctx, lColor, fColor, offset);
+        this.wire.draw(ctx, undefined, undefined, offset);
+    }
 }

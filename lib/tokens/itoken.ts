@@ -12,6 +12,8 @@ export interface IToken{
     config: any;
     delete: boolean;
     id: string;
+    x: number;
+    y: number;
 
     getCenter();
 

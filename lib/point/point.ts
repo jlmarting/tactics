@@ -10,7 +10,7 @@ export class Point {
     constructor(x: number, y: number) {
         this.x = x;
         this.y = y;
-        this.info;        
+        this.info = "";
         this.startTime = window.performance.now();
         this.id = 'point_' + this.startTime;
         this.config = { position: 'relative', color: 'red', viewName: false };
@@ -25,42 +25,39 @@ export class Point {
         return { "x": Math.round(this.x), "y": Math.round(this.y) }
     }
 
-    draw(lColor,fColor, self){
-        if(this.config == undefined){          
-            this.config = {};
+    getRelPos(offset?: {x: number, y: number}) {
+        if (offset) {
+            return { x: Math.round(this.x + offset.x), y: Math.round(this.y + offset.y) };
         }
-        
-        if(this.config.color == undefined){
+        // Si no hay offset, devolvemos la posición absoluta (o relativa al origen 0,0)
+        return { x: Math.round(this.x), y: Math.round(this.y) };
+    }
 
-            if(lColor==undefined){
-                lColor = "red";
-            }
-            
-            if(fColor==undefined){
-                fColor = "white";
-            }
-        }else{
+    draw(ctx: CanvasRenderingContext2D, lColor?: string, fColor?: string, offset?: {x: number, y: number}) {
+        if (!ctx) return;
+
+        if (this.config.color !== undefined) {
             lColor = "white";
             fColor = this.config.color;
-        }
-        
-                
-        self.ctx.beginPath();    
-        self.ctx.strokeStyle = lColor;
-        self.ctx.fillStyle = fColor;   
-
-        if(this.config.position == 'relative'){
-            self.ctx.fillRect(this.x+self.x, this.y+self.y, 4,4);
-            self.ctx.fillText('*('+this.x +',' + this.y+')',this.x+self.x, this.y+self.y);                
-        }else{
-            self.ctx.fillRect(this.x, this.y, 2,2);   
-            self.ctx.fillText('**('+this.x +',' + this.y+')',Math.round(this.x), Math.round(this.y));             
+        } else {
+            lColor = lColor || "red";
+            fColor = fColor || "white";
         }
 
-        self.ctx.stroke();    
-    }
-    
-    getRelPos = function(){
-        return {x:Math.round(this.x+self.x), y:Math.round(this.y+self.y)};
+        ctx.beginPath();
+        ctx.strokeStyle = lColor;
+        ctx.fillStyle = fColor;
+
+        const pos = this.getRelPos(offset);
+
+        if (this.config.position === 'relative') {
+            ctx.fillRect(pos.x, pos.y, 4, 4);
+            ctx.fillText('*(' + this.x + ',' + this.y + ')', pos.x, pos.y);
+        } else {
+            ctx.fillRect(this.x, this.y, 2, 2);
+            ctx.fillText('**(' + this.x + ',' + this.y + ')', Math.round(this.x), Math.round(this.y));
+        }
+
+        ctx.stroke();
     }
 }
