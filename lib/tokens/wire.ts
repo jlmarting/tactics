@@ -1,203 +1,160 @@
-//Token poligonal. Sin imagen. Se forma con la unión de una sucesión de puntos ordenada     
-import {Point} from "../point/point";
+// Token poligonal. Sin imagen. Se forma con la unión de una sucesión de puntos ordenada
+import { Point } from "../point/point";
 import { CursorPoint } from '../point/cursorpoint';
 import { Vector } from './vector';
 
-export class WireToken{
+export class WireToken extends CursorPoint {
+    points: Point[];
+    mod_points: Point[];
+    bkpx: string;
+    bkpy: string;
+    bkpRad: string;
+    bkppoints: string;
+    lastRad: number;
 
-    constructor(id, p: Point){  
-        CursorPoint.call(this,p.x,p.y,0);
+    constructor(id: string, p: Point) {
+        super(p.x, p.y, 0);
         this.id = id;
-        this.config = {viewName:false, selectable:true, position: 'relative', color: 'white', radial: false, enabled: true, closed: true, mesage: ""};         
-        this.points = [];  
+        this.config = {
+            viewName: false,
+            selectable: true,
+            position: 'relative',
+            color: 'white',
+            radial: false,
+            enabled: true,
+            closed: true,
+            message: ""
+        };
+        this.points = [];
         this.mod_points = [];
-        this.bkpx;
-        this.bkpy; 
-        this.bkppoints = [];
-        this.lastRad = this.rad; 
-        this.x = p.x;
-        this.y = p.y;
+        this.lastRad = this.rad;
     }
-    
-    WireToken.prototype = Object.create(CursorPoint.prototype);
-    
-    WireToken.prototype.getRelPos = function(){
-        //console.log(this.id);
-        return Point.prototype.getRelPos.call(this);
-    }
-    
-    WireToken.prototype.draw = function(ctx){   
-        if(this.config.enabled==false){
+
+    draw(ctx: CanvasRenderingContext2D, lColor?: string, fColor?: string, offset?: { x: number, y: number }) {
+        if (this.config.enabled === false) {
             this.x = JSON.parse(this.bkpx);
-            this.y = JSON.parse(this.bkpy);        
-            this.points = JSON.parse(this.bkppoints);
-            this.rad = JSON.parse(this.bkpRad);
-            this.config.enabled = true;        
-        } 
-        var vectors = this.getVectors();
-        CursorPoint.prototype.draw.call(this,ctx);
-        vectors.forEach(e =>{
-             e.draw(ctx)
-         });
-         if(this.config.radial == true){
-            vectors = this.getRadialVectors();
-            CursorPoint.prototype.draw.call(this,ctx);
-            vectors.forEach(e =>{
-            e.config.color = 'cyan'; 
-            e.draw(ctx)
-         });
-         }
-        
-     }
-    
-    
-    WireToken.prototype.move =  function(cmd, displ){  
-        
-        if(this.config.enabled==false){
-            this.x = JSON.parse(this.bkpx);
-            this.y = JSON.parse(this.bkpy);        
+            this.y = JSON.parse(this.bkpy);
             this.points = JSON.parse(this.bkppoints);
             this.rad = JSON.parse(this.bkpRad);
             this.config.enabled = true;
-            return;       
-        } 
-    
+        }
+        const vectors = this.getVectors();
+        super.draw(ctx, undefined, undefined, offset);
+        vectors.forEach(e => {
+            e.draw(ctx, offset);
+        });
+        if (this.config.radial === true) {
+            const radialVectors = this.getRadialVectors();
+            radialVectors.forEach(e => {
+                e.config.color = 'cyan';
+                e.draw(ctx, offset);
+            });
+        }
+    }
+
+    move(cmd: string, displ: number): any {
+        if (this.config.enabled === false) {
+            this.x = JSON.parse(this.bkpx);
+            this.y = JSON.parse(this.bkpy);
+            this.points = JSON.parse(this.bkppoints).map((p: any) => new Point(p.x, p.y));
+            this.rad = JSON.parse(this.bkpRad);
+            this.config.enabled = true;
+            return;
+        }
+
         this.bkpRad = JSON.stringify(this.rad);
         this.bkpx = JSON.stringify(this.x);
         this.bkpy = JSON.stringify(this.y);
         this.bkppoints = JSON.stringify(this.points);
-    
+
+        const dXY = super.move(cmd, displ);
         
-        if(this.rad > Math.PI *2){
-            this.rad -= Math.PI*2;
-        }
-        if(this.lastRad==null){
-            this.lastRad = this.rad;
-        }
-        
-        console.log(`1.- Centro antes de mover: (${this.x}, ${this.y}) ${this.rad} rad`);
-        var dXY = CursorPoint.prototype.move.call(this,cmd,displ);   
-        console.log(`Vector move ${dXY.x}, ${dXY.y}`);     
-        console.log(`2.- Centro despues de mover: (${this.x}, ${this.y}) ${this.rad} rad`);
-    
-    
-        //giramos el incremento de rad entre el actual y el anterior
-        var rad = (this.lastRad - this.rad)*(-1);    
-        console.log(`Giro: ${rad}`);
-        //var rad = this.rad;
-    
-        var distancias = [];
-        this.points.forEach(element => {
-            distancias.push(0);
-        });
-       
-        this.config.message = "MOVE:"
-    
-        this.mod_points = this.points.slice(0);
-    
-        for(var i=0; i<this.points.length; i++){              
-            let p: any = this.points[i];     
-            var temp = new Point(0,0);
-            
-            // p.x = dXY.x + (Math.cos(rad)*(p.x-dXY.x)) - (Math.sin(rad)*(p.y-dXY.y)) ;
-            // p.y = dXY.y + (Math.sin(rad)*(p.x-dXY.x)) + (Math.cos(rad)*(p.y-dXY.y)) ;
-            temp.x = this.x + (Math.cos(rad)*Math.round(p.x-this.x)) - (Math.sin(rad)*Math.round(p.y-this.y));
-            temp.y = this.y + (Math.sin(rad)*Math.round(p.x-this.x)) + (Math.cos(rad)*Math.round(p.y-this.y));
-    
+        const radDelta = (this.lastRad - this.rad) * (-1);
+
+        for (let i = 0; i < this.points.length; i++) {
+            const p = this.points[i];
+            const temp = { x: 0, y: 0 };
+
+            temp.x = this.x + (Math.cos(radDelta) * Math.round(p.x - this.x)) - (Math.sin(radDelta) * Math.round(p.y - this.y));
+            temp.y = this.y + (Math.sin(radDelta) * Math.round(p.x - this.x)) + (Math.cos(radDelta) * Math.round(p.y - this.y));
+
             temp.x += dXY.dx;
-            temp.y += dXY.dy; 
-    
+            temp.y += dXY.dy;
+
             p.x = temp.x;
             p.y = temp.y;
-    
-            var distancia = Math.sqrt(Math.pow((p.y-this.y),2)+Math.pow((p.x-this.x),2));
-            console.log(`Distancia punto ${i} al centro: ${distancia}`);
-            if(distancias[i]==0){
-                distancias[i] = distancia;
-            }else{
-                distancias[i] -= distancia;
-            }        
-            console.log(`Diferencia Distancia punto ${i} al centro: ${distancias[i]}`);
-            
-            this.points[i] = p;
         }
-        
-        this.lastRad = this.rad; 
-        //this.setCenter();  
+
+        this.lastRad = this.rad;
         return dXY;
-    };
-    
-    
-    
-    //Método de carga de puntos
-    WireToken.prototype.load = function(p){    
-        if(p instanceof Point){
-            this.points.push(p);
-        }   
-        var d = Math.sqrt(Math.pow((p.y-this.y),2)+Math.pow((p.x-this.x),2));
-        console.log('Distancia: ' + d);
     }
-    
-    WireToken.prototype.setCenter = function(){
-        var sX= 0;
-        var sY= 0;
-        this.points.forEach(p=>{
+
+    load(p: Point) {
+        if (p instanceof Point) {
+            this.points.push(p);
+        }
+    }
+
+    /**
+     * Calcula el centro geométrico del polígono basado en el promedio de sus vértices
+     * y actualiza la posición del token.
+     */
+    setCenter() {
+        if (this.points.length === 0) return;
+
+        let sX = 0;
+        let sY = 0;
+        this.points.forEach(p => {
             sX += p.x;
             sY += p.y;
-        })
-        //Punto central
-        this.x = Math.round(sX/this.points.length);
-        this.y = Math.round(sY/this.points.length);
+        });
+
+        // Punto central promedio
+        this.x = Math.round(sX / this.points.length);
+        this.y = Math.round(sY / this.points.length);
     }
-    
-    
-    //A partir de los puntos, obtenemos vectores
-    WireToken.prototype.getVectors = function(){
-        var vectors = [];
-        for(var i = 0; i<this.points.length; i++){
-            var next = i+1; 
-            if(next>=this.points.length){
-                if(this.config.closed){
+
+    getVectors() {
+        const vectors = [];
+        for (let i = 0; i < this.points.length; i++) {
+            let next = i + 1;
+            if (next >= this.points.length) {
+                if (this.config.closed) {
                     next = 0;
-                }else{
+                } else {
                     return vectors;
                 }
             }
-            var v = new Vector(this.id+`_${i}`,this.points[i].x,this.points[i].y,this.points[next].x,this.points[next].y);  
-            v.config.color = this.config.color;     
-            vectors.push(v);        
+            const v = new Vector(this.id + `_${i}`, this.points[i].x, this.points[i].y, this.points[next].x, this.points[next].y);
+            v.config.color = this.config.color;
+            vectors.push(v);
         }
         return vectors;
     }
-    
-    WireToken.prototype.getRadialVectors = function(){
-        var vectors = [];
-        for(var i = 0; i<this.mod_points.length; i++){        
-            var v = new Vector(this.id+`_r_${i}` ,this.x,this.y ,this.mod_points[i].x,this.mod_points[i].y);  
-            v.config.color = this.config.color;     
-            vectors.push(v);        
+
+    getRadialVectors() {
+        const vectors = [];
+        for (let i = 0; i < this.points.length; i++) {
+            const v = new Vector(this.id + `_r_${i}`, this.x, this.y, this.points[i].x, this.points[i].y);
+            v.config.color = this.config.color;
+            vectors.push(v);
         }
         return vectors;
     }
-    
-    //Devuelve puntos de intersección con otro WireToken
-    WireToken.prototype.getIntersections = function(otherWire){
-        
-        let ownVectors = this.getVectors();
-        let otherVectors =otherWire.getVectors();
-        let intersections = []
-    
-        for(var i = 0; i<ownVectors.length; i++){
-            for(var j = 0; j<otherVectors.length; j++){
-                var p = ownVectors[i].intersection(otherVectors[j]);   
-                if(p != null) {
+
+    getIntersections(otherWire: WireToken) {
+        const ownVectors = this.getVectors();
+        const otherVectors = otherWire.getVectors();
+        const intersections = [];
+
+        for (let i = 0; i < ownVectors.length; i++) {
+            for (let j = 0; j < otherVectors.length; j++) {
+                const p = ownVectors[i].intersection(otherVectors[j]);
+                if (p != null) {
                     intersections.push(p);
-                }        
-            }            
+                }
+            }
         }
         return intersections;
     }
-
-
-
-} 
+}

@@ -1,126 +1,127 @@
 import { AutoToken } from '../tokens/auto';
-import { BulletProjectile } from '../bulletprojectile';
+import { BulletProjectile } from '../projectile/bulletprojectile';
 import { WireToken } from '../tokens/wire';
-import { Projectile} from '../projectile/projectile';
+import { Projectile } from '../projectile/projectile';
 import { Shooter } from '../tokens/shooter';
 import { Effects } from '../tactics';
 import { IToken } from '../tokens/itoken';
 
-export const Engine = function(scene){
+/**
+ * Clase Engine: Corazón lógico del motor de juego.
+ * Gestiona el ciclo de actualización (logic loop), la resolución de comandos
+ * y la automatización de objetos (balas, IA simple).
+ */
+export class Engine {
+    /** Referencia a la escena que contiene los tokens. */
+    scene: any;
 
+    /** Pila de comandos activos (presionados) recibidos desde el control. */
+    mapkey: string[];
+
+    /**
+     * @param scene Instancia de Scene que el motor debe procesar.
+     */
+    constructor(scene: any) {
         this.scene = scene;
         this.mapkey = [];
-        
-        this.start = function(){
-                setInterval(function(){
-                        this.resolver(1);
-                        this.automat();}.bind(this), 16);
-        }
+    }
 
-        var self = this;
+    /**
+     * Inicia el ciclo lógico del motor con un intervalo fijo de 16ms (~60 FPS).
+     */
+    start() {
+        setInterval(() => {
+            this.resolver();
+            this.automat();
+        }, 16);
+    }
 
-        //Movimientos automáticos (autopilot, balas,...)
-        this.automat = function(){
-            scene.arrTokens.forEach(function(t: IToken){  //Según el tipo de token realizaremos unas u otras opciones                                                                  
-                
-                if (t.delete) {
-                    var tokenIndex = scene.arrTokens.findIndex(function(element){
-                        return element.id == t.id;
-                    });                                                                   
-                    scene.arrTokens.splice(tokenIndex,1);
-                    scene.tokenIndex = scene.arrTokens.findIndex(function(element){
-                        return element.id == scene.tokenId;
-                    });
-                }            
-                
-                
-                
-                if (t instanceof AutoToken){   
-                    let tk: AutoToken = t;                            
-                    //self.orders.push({cmd:'autopilot',id:t.id, displ: t.displ, timestamp: window.performance.now()});
-                    tk.autopilot(scene.arrTokens);                                
+    /**
+     * Ciclo de automatización: Procesa comportamientos autónomos de los tokens.
+     * - Elimina tokens marcados para borrado.
+     * - Actualiza pilotos automáticos (AutoToken).
+     * - Actualiza trayectoria de proyectiles.
+     * - Verifica intersecciones de WireTokens seleccionados.
+     */
+    automat() {
+        this.scene.arrTokens.forEach((t: IToken) => {
+            // Gestión de eliminación
+            if (t.delete) {
+                const tokenIndex = this.scene.arrTokens.findIndex((element: any) => element.id === t.id);
+                this.scene.arrTokens.splice(tokenIndex, 1);
+                // Ajustamos el índice de selección si es necesario
+                this.scene.tokenIndex = this.scene.arrTokens.findIndex((element: any) => element.id === this.scene.tokenId);
+            }
+
+            // Comportamiento de IA / Piloto automático
+            if (t instanceof AutoToken) {
+                t.autopilot(this.scene.arrTokens);
+            }
+
+            // Lógica de proyectiles
+            if (t instanceof Projectile) {
+                if (t instanceof BulletProjectile) {
+                    t.shot(this.scene.arrTokens);
                 }
-                
-                if (t instanceof Projectile){    
-                    
-                    if (t instanceof BulletProjectile){                                                                           
-                        //self.orders.push({cmd:'shot',id:t.id, displ: t.displ, timestamp: window.performance.now()});
-                        let tk: BulletProjectile= t;                            
-                        var d = tk.shot(scene.arrTokens);                  
-                    }                          
-                }
+            }
 
-                          
-                //Prueba intersección wiretoken del token seleccionado en tiempo real           
-                if((t instanceof WireToken)&&(t.id == scene.getSelectedToken().id)){
-                    var iPoints = [];
-                    scene.buffer.intersections = [];
-                    for(var i = 0; i<scene.arrTokens.length;i++){
-                        var element = scene.arrTokens[i];
-                        if(element instanceof WireToken){
-                            let tk: WireToken = t;                            
-                            iPoints = tk.getIntersections(element);
-                        }                        
-                        iPoints.forEach(e =>{console.log(e);scene.buffer.intersections.push(e)});
-                    } 
-                    //Pasamos los vértices al mensaje de la escena
-                    scene.message = `# ${t.config.message} # ${t.id} Centro:-> [${t.x},${t.y}] Vértices: `;
-                    t.points.forEach(element => {
-                        scene.message = scene.message + `[${element.x} , ${element.y}] `;
-                    });
-                    
-
-                }
-                if (scene.buffer.intersections.length>0){
-                    //Marcamos el token para indicar que hay colisión
-                    t.config.enabled = false;
-                }    
-
-            });  
-            
-  
-            return window.performance.now();
-        }
-
-
-        // Resolver
-        this.resolver = function(){
-            //Ejecución de comandos de control sobre el token seleccionado
-            let selectedToken = scene.arrTokens[scene.tokenIndex];
-
-            self.mapkey.forEach(function(cmd){   
-                
-                let t = scene.arrTokens[scene.tokenIndex];
-                //self.orders.push({cmd:cmd,id:t.id, displ: t.displ, timestamp: window.performance.now()});
-    
-    
-                //tratamiento de comandos
-                if(cmd=="fire"){
-                    if( selectedToken instanceof Shooter){
-                        
-                        var bullet = selectedToken.shot();
-                        
-                        if(bullet instanceof BulletProjectile){                      
-                            bullet.effect = Effects[theScene.config.effect];
-                            scene.arrTokens.push(bullet);                
-                        }else{
-                            scene.engineInfo = `scene.fire -> ${JSON.stringify(bullet)} recargando/sin balas`;
-                        }
+            // Prueba de intersecciones en tiempo real para el WireToken seleccionado
+            const selectedToken = this.scene.getSelectedToken();
+            if (t instanceof WireToken && selectedToken && t.id === selectedToken.id) {
+                this.scene.buffer.intersections = [];
+                for (let i = 0; i < this.scene.arrTokens.length; i++) {
+                    const element = this.scene.arrTokens[i];
+                    if (element instanceof WireToken && element !== t) {
+                        const iPoints = t.getIntersections(element);
+                        iPoints.forEach((e: any) => this.scene.buffer.intersections.push(e));
                     }
-                    
                 }
-                else{
-                    scene.engineInfo = `scene.move -> ${cmd} `;              
-                    selectedToken.move(cmd, selectedToken.displ,scene.arrTokens);                
-                    
-                } 
-            });
-            return window.performance.now();
-        }
 
+                // Actualizar mensaje de depuración con vértices
+                this.scene.message = `# ${t.config.message} # ${t.id} Centro:-> [${t.x},${t.y}] Vértices: `;
+                t.points.forEach(element => {
+                    this.scene.message += `[${element.x} , ${element.y}] `;
+                });
+            }
 
+            // Desactivar temporalmente si hay colisión detectada en buffer
+            if (this.scene.buffer.intersections.length > 0) {
+                t.config.enabled = false;
+            }
+        });
 
-    
-    
+        return window.performance.now();
+    }
 
+    /**
+     * Ciclo de resolución: Ejecuta los comandos de la pila mapkey sobre el token seleccionado.
+     * Se encarga del movimiento controlado por el usuario y de la acción de disparo.
+     */
+    resolver() {
+        const selectedToken = this.scene.arrTokens[this.scene.tokenIndex];
+
+        this.mapkey.forEach((cmd) => {
+            if (cmd === "fire") {
+                // El comando fire solo es válido para tokens tipo Shooter
+                if (selectedToken instanceof Shooter) {
+                    const bullet = selectedToken.shot();
+                    if (bullet instanceof BulletProjectile) {
+                        // Asignamos el efecto actual configurado en la escena a la bala
+                        bullet.effect = Effects[this.scene.config.effect];
+                        this.scene.arrTokens.push(bullet);
+                    } else {
+                        this.scene.engineInfo = `scene.fire -> recargando/sin balas`;
+                    }
+                }
+            } else {
+                // Comandos de movimiento
+                this.scene.engineInfo = `scene.move -> ${cmd} `;
+                if (selectedToken && typeof selectedToken.move === 'function') {
+                    // El movimiento puede estar condicionado por colisiones si el token las soporta
+                    selectedToken.move(cmd, selectedToken.displ, this.scene.arrTokens);
+                }
+            }
+        });
+        return window.performance.now();
+    }
 }

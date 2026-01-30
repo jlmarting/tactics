@@ -1,30 +1,22 @@
-import { Point } from '../point/point';
-import { ColliderToken, Collider } from './collider';
+import { ColliderToken } from './collider';
+
 // Token con movimiento programado (sigue comandos del plan)
-// export const AutoToken = function(id,x,y,rad,src,w,h){
-//     ColliderToken.call(this,id,x,y,rad,src,w,h);
-//     this.plan = [];
-// } 
+export class AutoToken extends ColliderToken {
+    plan: string[];
 
-// AutoToken.prototype = Object.create(ColliderToken.prototype);
-
-// AutoToken.prototype.autopilot = function(tokens){
-//                                     //se envían movimientos (keyCodes) de la pila "plan"
-//                                     if(this.plan.length>0){            
-//                                         var order = this.plan.pop();
-//                                         this.plan.unshift(order);                        
-//                                         this.move(order,2,tokens);                                 
-//                                     }
-//                                 };
-class AutoToken extends ColliderToken {
-
-    plan: Array<Point>;
-    constructor(id,x,y,rad,src,w,h){
-        super(id,x,y,rad,src,w,h);
+    constructor(id: string, x: number, y: number, rad: number, src: string, w: number, h: number) {
+        super(id, x, y, rad, src, w, h);
+        this.plan = [];
     }
 
-
-
-} 
-
-
+    autopilot(tokens: any[]) {
+        // se envían movimientos (keyCodes) de la pila "plan"
+        if (this.plan.length > 0) {
+            const order = this.plan.pop();
+            if (order) {
+                this.plan.unshift(order);
+                this.move(order, 2, tokens);
+            }
+        }
+    }
+}

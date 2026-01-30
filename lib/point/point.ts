@@ -1,66 +1,100 @@
+/**
+ * Clase Point: Representa una coordenada bidimensional (X, Y) en el mapa.
+ * Es la base de todos los objetos espaciales del motor.
+ */
 export class Point {
-
+    /** Coordenada X absoluta en el mapa de juego. */
     x: number;
+    /** Coordenada Y absoluta en el mapa de juego. */
     y: number;
+    /** Información textual auxiliar. */
     info: string;
+    /** Identificador único basado en la estampa de tiempo de creación. */
     id: string;
+    /** Tiempo de creación en milisegundos de alta precisión. */
     startTime: number;
+    /** Configuración visual del punto (color, visibilidad, etc.). */
     config: any;
 
+    /**
+     * @param x Posición X inicial.
+     * @param y Posición Y inicial.
+     */
     constructor(x: number, y: number) {
         this.x = x;
         this.y = y;
-        this.info;        
+        this.info = "";
         this.startTime = window.performance.now();
         this.id = 'point_' + this.startTime;
         this.config = { position: 'relative', color: 'red', viewName: false };
     }
 
+    /**
+     * Posiciona el punto en una nueva coordenada redondeada.
+     */
     placeAt(x: number, y: number) {
         this.x = Math.round(x);
         this.y = Math.round(y);
     }
 
+    /**
+     * Devuelve las coordenadas actuales del centro del punto.
+     */
     getCenter() {
         return { "x": Math.round(this.x), "y": Math.round(this.y) }
     }
 
-    draw(lColor,fColor, self){
-        if(this.config == undefined){          
-            this.config = {};
+    /**
+     * Calcula la posición relativa a un desplazamiento (offset) dado.
+     * Se usa para traducir coordenadas del mapa a coordenadas de pantalla (canvas)
+     * basándose en la posición de la cámara (escena).
+     * @param offset Objeto {x, y} que representa la posición de la cámara.
+     */
+    getRelPos(offset?: {x: number, y: number}) {
+        if (offset) {
+            return { x: Math.round(this.x + offset.x), y: Math.round(this.y + offset.y) };
         }
-        
-        if(this.config.color == undefined){
+        return { x: Math.round(this.x), y: Math.round(this.y) };
+    }
 
-            if(lColor==undefined){
-                lColor = "red";
-            }
-            
-            if(fColor==undefined){
-                fColor = "white";
-            }
-        }else{
+    /**
+     * Dibuja el punto en el contexto de canvas.
+     * @param ctx Contexto 2D del canvas.
+     * @param lColor Color de línea (opcional).
+     * @param fColor Color de relleno (opcional).
+     * @param offset Desplazamiento de cámara para posicionamiento relativo.
+     */
+    draw(ctx: CanvasRenderingContext2D, lColor?: string, fColor?: string, offset?: {x: number, y: number}) {
+        if (!ctx) return;
+
+        // Prioridad de color: config.color > parámetros pasados > valores por defecto
+        if (this.config.color !== undefined) {
             lColor = "white";
             fColor = this.config.color;
-        }
-        
-                
-        self.ctx.beginPath();    
-        self.ctx.strokeStyle = lColor;
-        self.ctx.fillStyle = fColor;   
-
-        if(this.config.position == 'relative'){
-            self.ctx.fillRect(this.x+self.x, this.y+self.y, 4,4);
-            self.ctx.fillText('*('+this.x +',' + this.y+')',this.x+self.x, this.y+self.y);                
-        }else{
-            self.ctx.fillRect(this.x, this.y, 2,2);   
-            self.ctx.fillText('**('+this.x +',' + this.y+')',Math.round(this.x), Math.round(this.y));             
+        } else {
+            lColor = lColor || "red";
+            fColor = fColor || "white";
         }
 
-        self.ctx.stroke();    
-    }
-    
-    getRelPos = function(){
-        return {x:Math.round(this.x+self.x), y:Math.round(this.y+self.y)};
+        ctx.beginPath();
+        ctx.strokeStyle = lColor;
+        ctx.fillStyle = fColor;
+
+        // Calculamos la posición donde realmente se debe pintar en el canvas
+        const pos = this.getRelPos(offset);
+
+        if (this.config.position === 'relative') {
+            // Dibujar un pequeño cuadrado y su coordenada informativa
+            ctx.fillRect(pos.x, pos.y, 4, 4);
+            if (this.config.viewName) {
+                ctx.fillText('*(' + Math.round(this.x) + ',' + Math.round(this.y) + ')', pos.x, pos.y);
+            }
+        } else {
+            // Posicionamiento absoluto (ignora offset)
+            ctx.fillRect(this.x, this.y, 2, 2);
+            ctx.fillText('**(' + this.x + ',' + this.y + ')', Math.round(this.x), Math.round(this.y));
+        }
+
+        ctx.stroke();
     }
 }

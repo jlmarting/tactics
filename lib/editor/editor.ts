@@ -1,89 +1,96 @@
 import { WireToken } from '../tokens/wire';
 import { Point } from '../point/point';
+import { Scene } from '../scene/scene';
 
+/**
+ * Clase Editor: Proporciona herramientas para la creación de polígonos (WireTokens)
+ * mediante clics en el canvas y atajos de teclado.
+ */
+export class Editor {
+    scene: Scene;
+    points: Point[];
 
-export const Editor = function(scene){
-    //Puntos de trazado activos del editor
-    this.points = [];  
+    /**
+     * @param scene Referencia a la escena donde se añadirán los tokens creados.
+     */
+    constructor(scene: Scene) {
+        this.scene = scene;
+        // Puntos de trazado activos del editor (vértices del polígono en creación)
+        this.points = [];
 
-    var self = this;
+        this.initEvents();
+    }
 
-    document.addEventListener('keypress',function(e){
-        console.log(`keypress ${e.keyCode} - points: ${self.points.length}`);
-        if(e.keyCode == 110){
-            var tPoints  = self.points.slice(0);
-            var p = tPoints[0];
-            var wt = new WireToken('wiretoken'+ scene.arrTokens.length, p);    
-            
-            //self.points.forEach(p=>{wt.load(p)});
-            wt.points = self.points.slice(0);
-            wt.setCenter();            
-            console.log(`punto medio de ${wt.id}: ${wt.x}, ${wt.y}`);
-            //wt.points = self.points;            
-            //wt.points.push(wt.points[0]);
-            
-            scene.arrTokens.push(wt);
-            console.log('Insertado wiretoken: ' + wt.id);
-            //el control pasa al último token recien creado
-            scene.tokenIndex = scene.arrTokens.length-1;
-            scene.reloadSel();
-            scene.arrTokens.forEach(element => {
-                if(element instanceof WireToken){
-                    var iPoints = wt.getIntersections(element);
-                    iPoints.forEach(e =>{scene.buffer.intersections.push(e)});
-                }     
-            });
-            self.points = [];
-            scene.buffer.drawing = [];
+    /**
+     * Inicializa los eventos de teclado y ratón para interactuar con el editor.
+     */
+    private initEvents() {
+        document.addEventListener('keypress', (e: KeyboardEvent) => {
+            // Tecla 'n' (110): Finaliza el trazado actual y crea un WireToken
+            if (e.keyCode === 110) {
+                if (this.points.length === 0) return;
 
+                const firstPoint = this.points[0];
+                const wt = new WireToken('wiretoken' + this.scene.arrTokens.length, firstPoint);
+
+                // Asignamos los puntos capturados al nuevo token
+                wt.points = [...this.points];
+
+                // Recalculamos el centro del polígono basado en sus vértices
+                wt.setCenter();
+
+                this.scene.arrTokens.push(wt);
+                console.log('Insertado wiretoken: ' + wt.id);
+
+                // Cambiamos el foco al nuevo token
+                this.scene.setToken(wt.id);
+
+                // Recargamos el selector de la UI
+                this.scene.reloadSel();
+
+                // Limpiamos los puntos de trazado
+                this.points = [];
+                this.scene.buffer.drawing = [];
+            }
+
+            // Tecla 'd' (100): Cancela el trazado actual y borra los puntos temporales
+            if (e.keyCode === 100) {
+                this.points = [];
+                this.scene.buffer.drawing = [];
+            }
+
+            // Tecla 's' (115): Demo de creación de una línea simple centrada
+            if (e.keyCode === 115) {
+                const p0 = new Point(0, 0);
+                const wt = new WireToken("demo", p0);
+                wt.load(new Point(-250, 0));
+                wt.load(new Point(250, 0));
+
+                this.scene.arrTokens.push(wt);
+                this.scene.setToken(wt.id);
+
+                this.points = [];
+                this.scene.buffer.drawing = [];
+            }
+        });
+
+        // Clic en el canvas: Añade un nuevo vértice al trazado actual
+        const canvasElem = document.getElementById("tactics");
+        if (canvasElem) {
+            canvasElem.onclick = (e: MouseEvent) => {
+                const rect = this.scene.canvas.getBoundingClientRect();
+
+                // Traducimos las coordenadas del ratón a coordenadas del mapa del motor
+                const mapX = Math.round(e.clientX - rect.left - this.scene.x);
+                const mapY = Math.round(e.clientY - rect.top - this.scene.y);
+
+                const p = new Point(mapX, mapY);
+                p.id = 'P_' + e.clientX + '_' + e.clientY;
+
+                // Añadimos al buffer de dibujo temporal para visualización
+                this.scene.buffer.drawing.push(p);
+                this.points.push(p);
+            };
         }
-        if(e.keyCode == 100){  //tecla d, borramos
-            self.points = [];
-            scene.buffer.drawing = [];
-        }
-        if(e.keyCode == 115){  //tecla S, demo de giro
-            var p0 = new Point(0,0);
-            var wt = new WireToken("demo",p0);
-            var p1 = new Point(-250,0);
-            var p2 = new Point(250,0);
-            wt.load(p1);
-            wt.load(p2);
-          
-            scene.arrTokens.push(wt);
-            // var vueltas = 10;
-            // for(var rad = 0; rad += 0.01; rad < (2*Math.PI)*vueltas){
-            //     for(var i = 0; i = i; i<wt.points.length){
-            //         var p = wt.points[i];   
-            //         p.x = p0.x + (Math.cos(rad)*(p.x-p0.x)) - (Math.sin(rad)*(p.y-p0.y)) ;
-            //         p.y = p0.y + (Math.sin(rad)*(p.x-p0.x)) + (Math.cos(rad)*(p.y-p0.y)) ;
-            //     }
-            // } 
-            
-            scene.tokenIndex = scene.arrTokens.length-1;
-
-            self.points = [];
-            scene.buffer.drawing = [];
-        }
-        
-
-
-   
-    });
-
-    document.getElementById("tactics").onclick = function(e){
-        var rect = scene.canvas.getBoundingClientRect();
-        var p0 = new Point(rect.x, rect.y);
-        var p1 = new Point(e.x,e.y);
-        p1.x = Math.round(p1.x - p0.x - scene.x);
-        p1.y = Math.round(p1.y - p0.y - scene.y);
-        
-        var p = new Point(p1.x,p1.y);            
-
-        p.id = 'P_'+e.x + '_' + e.y;
-        scene.buffer.drawing.push(p);
-        this.last = p;        
-        self.points.push(p);  
-        
-    };
+    }
 }
-   
