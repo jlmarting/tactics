@@ -1,16 +1,8 @@
-// {
-//     "compilerOptions": {
-//       "target": "es2015",
-//       "module": "commonjs",
-//       "sourceMap": true
-//     }
-//   }
-
 {
-  "compilerOptions": {
-    "target": "es2017",
-    "module": "ES2020",
-    "sourceMap": true,
- //   "outDir": "dist"
+    "compilerOptions": {
+      "target": "es2015",
+      "module": "es2015",
+      "moduleResolution": "node",
+      "sourceMap": true
+    }
   }
-}

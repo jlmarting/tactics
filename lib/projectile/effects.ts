@@ -1,4 +1,4 @@
-import { ColliderToken } from '../tokens/collider.js'
+import { ColliderToken } from '../tokens/collider.js';
 
 // Effects: funciones de efectos de impacto    
 export class Effects {

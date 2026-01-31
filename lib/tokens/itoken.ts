@@ -1,4 +1,4 @@
-import { Point } from "../point/point";
+import { Point } from "../point/point.js";
 
 /**
  * Interface IToken: Define el contrato mínimo que debe cumplir cualquier objeto
