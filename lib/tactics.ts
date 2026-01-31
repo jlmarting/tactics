@@ -5,8 +5,8 @@ import { Rectangle } from "./tokens/rectangle"
 import { ImgToken } from './tokens/image';
 import { Collider} from './tokens/collider';
 import { Projectile } from './projectile/projectile';
-import { Scene } from './scene/scene';
-import { Engine } from './engine/engine';
+import { Scene } from './artifacts/scene/scene';
+import { Engine } from './artifacts/engine/engine/engine';
 import { Control } from './ui/control';
 import { Editor } from './editor/editor';
 import { WireToken } from './tokens/wire';

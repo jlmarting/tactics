@@ -1,33 +1,38 @@
-import { Point } from '../point/point';
-import { ImgToken } from '../tokens/image';
-import { Effects } from '../projectile/effects';
-import { IToken } from '../tokens/interfaces/itoken';
-import { CursorPoint } from '../point/cursorpoint';
-import { Vector } from '../tokens/vector';
-import { IntersectionPoint } from '../point/intersectionpoint';
-import { Projectile } from '../projectile/projectile';
-import { BulletProjectile } from '../projectile/bulletprojectile';
-import { ColliderToken } from '../tokens/colliderToken';
+import { Point } from '../../point/point';
+import { ImgToken, ImgToken, ImgToken } from '../../tokens/image';
+import { Effects } from '../../projectile/effects';
+import { IToken } from '../../tokens/interfaces/itoken';
+import { CursorPoint } from '../../point/cursorpoint';
+import { Vector } from '../../tokens/vector';
+import { IntersectionPoint } from '../../point/intersectionpoint';
+import { Projectile } from '../../projectile/projectile';
+import { BulletProjectile } from '../../projectile/bulletprojectile';
+import { ColliderToken } from '../../tokens/colliderToken';
 import { ViewPort} from './viewport'
+import { IScene, ISceneEngine, ISceneRendering } from './interfaces/iscene';
+import { IRenderer } from '../renderer/interfaces/irenderer';
+
 
 
 /**
  * Parte visible del mundo. Un recorte rectangular de lo que abarca nuestra vista. * 
  */
-class WorldTokens{
+private class World<T>{
 
-    public tokens: Array<IToken>;
-    public loadImg() {
-        this.tokens.forEach(function (t) {
-            if (t instanceof ImgToken) {
-                t.img = new Image();
-                t.img.src = t.src;
+    public tokens: Array<T>;
+
+    public load(){
+        this.tokens.forEach(
+            element => {
+                if(element instanceof ImgToken){
+                    element.img = new Image();
+                    element.img.src = element.src;
+                }
             }
-            else {
-            //Tratamiento alternativo
-            }
-        });
+        );
     }
+
+
     public purgeMarked(){ 
         this.tokens = this.tokens.filter(t=>!t.delete);                
     }
@@ -35,15 +40,17 @@ class WorldTokens{
 }
 
 
-class GridConfiguration{
+private class GridConfiguration{
      height: 0;
      width: 0;
      granularity: 50; 
+     color: 'white';     
+     visible: boolean;
 }
 
 
-class SceneConfiguration{
-        viewGrid: boolean;
+private class SceneConfiguration{        
+        pause: boolean;
         scale: number;
         viewColliders: boolean;
         viewIds: boolean;
@@ -53,54 +60,51 @@ class SceneConfiguration{
         enableAutoMov: boolean;
         effect: string;
         grid : GridConfiguration;
-    };
+};
 
-/**
- * Distancia relativa por componentes
- */
-class DeltaXY{
-    dx: number;
-    dy: number;
-    constructor(dx:number, dy: number){
-        this.dx = dx;
-        this.dy = dy;
-    }
+private class Scene2DCanvas{
+        public canvas: HTMLCanvasElement;
+        public ctx: CanvasRenderingContext2D;  
 }
 
 
 /**
  *  Soporte para representar una escena
  */
-export class Scene {
+export public class Scene<TRenderer extends IRenderer> implements IScene, ISceneEngine, ISceneRendering{
+    private worldTokens: WorldTokens;    
+    private renderer: TRenderer;
+    public viewPort: ViewPort;    
+    public config: SceneConfiguration;    
+    //Candidatos a borrar / reubicar
+  
 
-    public engineInfo: string;
-
-    private worldTokens: WorldTokens;
-    public buffer: { drawing, intersections, misc };
-    public renderQueue: any[];
-    public mapkey: any[];HTMLCanvasElement
-    public drawing: boolean;
-    public tokenIndex: number;
-    public tokenId: any;    
-    public canvas: HTMLCanvasElement;
-    public ctx: CanvasRenderingContext2D;
-    public orders: any[];
-    public message: string;
-    public x: number;
-    public y: number;
-    public viewPort: ViewPort;
-    public w: any;
-    public h: any;
+    public orders: [];
+    
     public autoFPS: any;
     public fps: any;
-    public config: SceneConfiguration;
+    public buffer: { drawing, intersections, misc };
+  
+    public mapkey: any[];
+    public drawing: boolean;
+    public tokenIndex: number;
+    public tokenId: string;    
+    public engineInfo: string;
+    public message: string;
 
-
+    
+    /**
+     * 
+     * @returns tokens que está gestionando la escena
+     */
     public getWorldTokens(){
         return this.worldTokens.tokens;
     }
 
 
+    /**
+     * Elimina tokens de la escena marcados para ello
+     */
     public deleteMarkedTokens(){
  
         this.worldTokens.purgeMarked();        
@@ -114,8 +118,7 @@ export class Scene {
      * Configuración de la escena por defecto
      */
     public defaultConfig():void {
-        this.config = new SceneConfiguration();
-        this.config.viewGrid = true;
+        this.config = new SceneConfiguration();        
         this.config.scale = 1;
         this.config.viewColliders = false;
         this.config.viewIds = false;
@@ -125,17 +128,12 @@ export class Scene {
         this.config.effect = 'damage';
         this.config.enableAutoMov = true;
         this.config.grid = new GridConfiguration();
+        this.config.grid.visible = true;
         this.config.grid.height = 0;
-        this.config.grid.width = 0;
+        this.config.grid.width = 0; 
         this.config.grid.granularity = 50;
     }
-
-    /**Posición por defecto de la escena */
-    public defaultPosition(): void{                
-                this.x = 500;
-                this.y = 500;
-    }
-
+ 
     /**
      * 
      * @param canvasId Identificador del ID del canvas existente en el DOM 
@@ -173,7 +171,7 @@ export class Scene {
         this.ctx = c.getContext('2d');
         this.orders = []; //Pila de órdenes a ejecutar (movimientos, disparos, étc)
         this.message = " - - - "; //para paso de mensajes de otro módulo
-        this.defaultPosition();
+        
         let viewportpoint = new Point(this.config.viewPortWidth, this.config.viewPortHeight);
         this.viewPort = new ViewPort(0 - (this.config.viewPortWidth - 5 / 2), 0 - (this.config.viewPortHeight - 5 / 2), viewportpoint.x, viewportpoint.y)
 
@@ -214,21 +212,42 @@ export class Scene {
         //     }
         // }Point
     }
+    getXYPosition(token: IToken): { x: number; y: number; };
+    getXYPosition(token: IToken): { x: number; y: number; };
+    getXYPosition(token: unknown): { x: number; y: number; } | { x: number; y: number; } {
+        throw new Error('Method not implemented.');
+    }
+    getXYViewPortPosition(): { x: number; y: number; };
+    getXYViewPortPosition(): { x: number; y: number; };
+    getXYViewPortPosition(): { x: number; y: number; } | { x: number; y: number; } {
+        throw new Error('Method not implemented.');
+    }
+    add(token: IToken): void;
+    add(token: IToken): void;
+    add(token: unknown): void {
+        throw new Error('Method not implemented.');
+    }
+    purge(): number;
+    purge(): number;
+    purge(): number {
+        throw new Error('Method not implemented.');
+    }
+    getViewPortTokens(): IToken[] {
+        throw new Error('Method not implemented.');
+    }
 
     
 /** * 
- * @param element elemento de la escena
- * @returns distancia relativa a la escena de este objeto por cada componente (x, y)
+ * @param point elemento de la escena
+ * @returns distancia relativa al viewport de este objeto por cada componente (x, y)
  */
 
-    public getRelPos(element: Object){
-        if (element instanceof Point){            
-            return new DeltaXY(Math.round(element.x + this.x),Math.round(element.y + this.y));
-        }
+    public getRelViewportPos(point: Point){        
+            return new DeltaXY(Math.round(point.x + this.x),Math.round(point.y + this.y));
     }
 
     /**
-     * 
+     * La escena renderizará en el canvas aquellos objetos reconocidos
      * @param element 
      */
     public drawElement(element: Object){
@@ -241,7 +260,7 @@ export class Scene {
         if (element instanceof CursorPoint){
             this.ctx.save();
             this.ctx.beginPath();
-            let relPos = this.getRelPos(element);
+            let relPos = this.getRelViewportPos(element);
             let p0 = new Point(this.x, this.y);
             let p1 = new Point(this.x + (Math.cos(element.rad) * 25), this.y + (Math.sin(element.rad) * 25));
             //var vector = new Vector(this);
@@ -318,6 +337,20 @@ export class Scene {
 
         }
 
+
+        /**
+         * 
+         * @param point 
+         * @param lColor 
+         * @param fColor 
+         */
+        public drawPoint(point: Point, lColor: string = 'white', fColor: string = 'black') {         
+
+            this.drawCoordPoint(point.x, point.y, lColor, fColor)
+       
+        }
+
+
         /**
          * 
          * @param x 
@@ -325,7 +358,7 @@ export class Scene {
          * @param lColor 
          * @param fColor 
          */
-        public drawPoint(x: number, y: number, lColor: string, fColor: string) {         
+        public drawCoordPoint(x: number, y: number, lColor: string, fColor: string) {         
 
             this.ctx.beginPath();
             this.ctx.strokeStyle = lColor;
@@ -347,7 +380,6 @@ export class Scene {
 
             this.ctx.stroke();
         }
-    
 
 
     public drawScene(timeStamp: number) {
@@ -369,7 +401,7 @@ export class Scene {
 
         //this.resolver(1);               
 
-        if (!this.pause) {
+        if (!this.config.pause) {
             //automatTime = this.automat();
         }
 
@@ -449,36 +481,36 @@ export class Scene {
         if (this.viewPort.enabled) {
             this.renderQueue = [];
             this.worldTokens.tokens = this.worldTokens.tokens.concat(this.buffer.drawing).concat(this.buffer.intersections);
-            this.viewPort.attachTo(this.worldTokens.tokens[this.tokenIndex]);
-            this.worldTokens.tokens.forEach(function (e) {
-                var p = this.getRelPos(e);
-                if (this.viewPort.isInside(p.x, p.y)) {
-                    this.arr.push(e)
-                }
+            let selectedToken = this.worldTokens.tokens[this.tokenIndex];
+            this.viewPort.attachTo(selectedToken);
+            this.worldTokens.tokens.forEach(
+                e => {                
+                    if (this.viewPort.isInside(e)) {
+                        this.renderQueue.push(e)
+                    }
             });
-
         }
         else {
             this.renderQueue = this.worldTokens.tokens.concat(this.buffer.drawing).concat(this.buffer.intersections);
-
         }
 
-        this.renderQueue.forEach(function (t) {  //Según el tipo de token realizaremos unas u otras opciones                                                           
+        this.renderQueue.forEach(
+            (t) => {  //Según el tipo de token realizaremos unas u otras opciones                                                           
 
-            if (t.destroy) {
-                t.collider = {};
-                t = {};
+                    if (t.destroy) {
+                        t.collider = {};
+                        t = {};
 
-                // var tokenIndex = theScene.arrTokens.findIndex(function(element){
-                //     return element.id == t.id;
-                // });                                                                   
-                // theScene.arrTokens.splice(tokenIndex,1);
-                // theScene.tokenIndex = theScene.arrTokens.findIndex(function(element){
-                //     return element.id == theScene.tokenId;
-                // });
-            } else {
-                t.draw(this.ctx);
-            }
+                        // var tokenIndex = theScene.arrTokens.findIndex(function(element){
+                        //     return element.id == t.id;
+                        // });                                                                   
+                        // theScene.arrTokens.splice(tokenIndex,1);
+                        // theScene.tokenIndex = theScene.arrTokens.findIndex(function(element){
+                        //     return element.id == theScene.tokenId;
+                        // });
+                    } else {
+                        t.draw(this.ctx);
+                    }
 
 
             // if (t instanceof Projectile) {
@@ -500,13 +532,13 @@ export class Scene {
                 
             // }
 
-            if (this.config.viewColliders) {
-                if (t instanceof ColliderToken) {
-                    t.collider.draw(this.canvas);
-                }
-            }return window.performance.now();
-
-
+                if (this.config.viewColliders) {
+                    if (t instanceof ColliderToken) {
+                        t.collider.draw(this.canvas);
+                    }
+            }
+            
+            return window.performance.now();
 
         });
         //this.viewPort.draw();
@@ -617,91 +649,105 @@ export class Scene {
     
 
 
-    resize() {
-        this.ctx.width = (window.innerWidth) * 1;
-        this.ctx.height = (window.innerHeight) * 0.95;
-        this.w = this.ctx.width;
-        this.h = this.ctx.height;
+    public resize() {
+        this.canvas.width = (window.innerWidth) * 1;
+        this.canvas.height = (window.innerHeight) * 0.95;
+        this.canvasWidth = this.canvas.width;
+        this.canvasHeight = this.canvas.height;
         this.ctx.scale(this.config.scale, this.config.scale);
     }
 
-    reloadSel() {
 
-        var tokenSelector = document.getElementById('tokens');
-
-        tokenSelector.load = function () {
-            tokenSelector.innerHTML = null;
-
-            this.arrTokens.forEach(function (t) {
+    public loadTokenOptions(selectorID: string){
+        const worldTokens = this.getWorldTokens();  
+        
+        const tokenSelectorDOM: HTMLSelectElement = <HTMLSelectElement>document.getElementById(selectorID);
+ 
+        worldTokens.forEach(function (t) {
                 if ((typeof t.config !== 'undefined') && (t.config.selectable)) {
-                    var opt = document.createElement('option');
+                    const opt = document.createElement('option');
                     opt.value = t.id;
                     opt.text = t.id;
                     if (t.id == this.tokenId) {
                         opt.selected = true;
                     }
-                    tokenSelector.appendChild(opt);
+                    tokenSelectorDOM.appendChild(opt);
                 }
             });
-        };
-        tokenSelector.load();
-
-        tokenSelector.onchange = function () {
-            var sel = tokenSelector.value;
+        
+        tokenSelectorDOM.onchange = function () {
+            let sel = tokenSelectorDOM.value;
             if (this.setToken(sel)) {
-                tokenSelector.blur();
+                tokenSelectorDOM.blur();
             };
-        };
+        }.bind(this);        
+    }
+
+
+    public reloadSel() {
+        this.loadTokenOptions("tokens");
     }
 
     //Movimiento de la ventana: transformamos las coordenadas de todos los objetos
-    move(x, y) {
+    public move(x, y) {
         this.x = x;
         this.y = y;
     }
 
     //Centrar la escena en un token (para hacer seguimiento)
-    centerOn(t:IToken) {
+    public centerOn(t:IToken) {
         if (typeof t == 'undefined') return false;
         var scale = this.config.scale;
-        var dx = (this.w / (2 * scale)) - t.x;
-        var dy = (this.h / (2 * scale)) - t.y;
+        var dx = (this.canvasWidth / (2 * scale)) - t.center.x;
+        var dy = (this.canvasHeight / (2 * scale)) - t.center.y;
         this.move(dx, dy);
     };
 
     //centramos vista en el token seleccionado en la escena 
     //generalmente designado por el control, el token que movemos
-    center() {
-        this.centerOn(this.arrTokens[this.tokenIndex]);
+    public center() {
+        this.centerOn(this.getWorldTokens()[this.tokenIndex]);
     }
     
-    draw(obj){
+    public draw(obj: Object){
         switch(obj.constructor){
             case Point: this.drawPoint(<Point>obj);break;
             case ImgToken: this.drawImgToken(<ImgToken>obj);break;
-            case ColliderToken: this.drawColliderToken(<ColliderToken>obj);break;
+            case ColliderToken: this.draw(<ColliderToken>obj);break;
             default: break;
         }
     }
 
 
 
-    drawImgToken(t: ImgToken){
+    private drawImgToken(t: ImgToken){
 
-        let ctx = this.ctx;
+        if(this.ctx){     
 
-        if(ctx){     
-            var pos;
+            /*
+
+            Supongamos que tenemos (10, 20)
+            - posición relativa:
+                Manda viewport
+            - posición absoluta:
+
+
+            */
+
+            let pos: DeltaXY;
+            let posImg: Point;
+            
             if(t.config.position == 'relative'){
-                pos = t.center.getRelPos(); 
+                pos = this.getRelViewportPos(t); 
             }
             else{
-                pos = {x:this.x,y:this.y};
+                pos = new DeltaXY(this.x,this.y);
             }
             
-            var posImg = {x:pos.x-(this.w/2),y:pos.y-(this.h/2)}                 
+
+            posImg = new Point(pos.dx-(this.canvasWidth/2),pos.dy-(this.canvasHeight/2));                 
             
-            ctx.save();
+            this.ctx.save();
             
             if(typeof t.img !== 'undefined'){                       
                 ctx.translate(pos.x, pos.y);            
@@ -782,7 +828,7 @@ export class Scene {
             if (typeof rpos != 'undefined') {
                 this.ctx.fillStyle = 'cyan';
                 this.ctx.fillText('[path steps: ' + this.arrTokens[this.tokenIndex].collider.back.length + ']', rpos.x, rpos.y);
-            }
+            }SceneConfiguration
         }
         this.ctx.lineWidth = l;
     }

@@ -1,11 +1,11 @@
-import { AutoToken } from '../tokens/auto';
-import { WireToken } from '../tokens/wire';
-import { Projectile} from '../projectile/projectile';
-import { Shooter } from '../tokens/shooter';
+import { AutoToken } from '../../../tokens/auto';
+import { WireToken } from '../../../tokens/wire';
+import { Projectile} from '../../../projectile/projectile';
+import { Shooter } from '../../../tokens/shooter';
 
-import { Scene } from '../scene/scene';
-import { IToken } from '../tokens/interfaces/itoken';
-import { BulletProjectile } from '../projectile/bulletprojectile';
+import { Scene } from '../../scene/scene';
+import { IToken } from '../../../tokens/interfaces/itoken';
+import { BulletProjectile } from '../../../projectile/bulletprojectile';
 
 export class Engine{
 
@@ -94,7 +94,8 @@ export class Engine{
                 //tratamiento de comandos
                 if(cmd=="fire"){
                     if( selectedToken instanceof Shooter){
-                        
+                         const delta = engine.update(scene); // engine actualiza, calcula tiempo, etc.
+    const renderTime = renderer.render(scene);
                         var bullet = selectedToken.shot();
                         
                         if(bullet instanceof BulletProjectile){                      
@@ -115,7 +116,8 @@ export class Engine{
             return window.performance.now();
         }
 
-
+ const delta = engine.update(scene); // engine actualiza, calcula tiempo, etc.
+    const renderTime = renderer.render(scene);
 
     
     
