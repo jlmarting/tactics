@@ -1,7 +1,7 @@
-import { ImgToken } from './image';
-import { Point } from '../point/point';
-import { CursorPoint } from '../point/cursorpoint';
-import { IToken } from './itoken';
+import { ImgToken } from './image.js';
+import { Point } from '../point/point.js';
+import { CursorPoint } from '../point/cursorpoint.js';
+import { IToken } from './itoken.js';
 
 /**
  * Clase Collider: Representa un colisionador circular.

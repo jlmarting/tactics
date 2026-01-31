@@ -1,10 +1,10 @@
-import { AutoToken } from '../tokens/auto';
-import { BulletProjectile } from '../projectile/bulletprojectile';
-import { WireToken } from '../tokens/wire';
-import { Projectile } from '../projectile/projectile';
-import { Shooter } from '../tokens/shooter';
-import { Effects } from '../tactics';
-import { IToken } from '../tokens/itoken';
+import { AutoToken } from '../tokens/auto.js';
+import { BulletProjectile } from '../projectile/bulletprojectile.js';
+import { WireToken } from '../tokens/wire.js';
+import { Projectile } from '../projectile/projectile.js';
+import { Shooter } from '../tokens/shooter.js';
+import { Effects } from '../tactics.js';
+import { IToken } from '../tokens/itoken.js';
 
 /**
  * Clase Engine: Corazón lógico del motor de juego.

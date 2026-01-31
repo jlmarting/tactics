@@ -1,6 +1,6 @@
-import { WireToken } from '../tokens/wire';
-import { Point } from '../point/point';
-import { Scene } from '../scene/scene';
+import { WireToken } from '../tokens/wire.js';
+import { Point } from '../point/point.js';
+import { Scene } from '../scene/scene.js';
 
 /**
  * Clase Editor: Proporciona herramientas para la creación de polígonos (WireTokens)

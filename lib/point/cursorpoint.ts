@@ -1,4 +1,4 @@
-import { Point } from "./point";
+import { Point } from "./point.js";
 
 /**
  * Clase CursorPoint: Extiende Point para añadirle capacidades de orientación (radianes)

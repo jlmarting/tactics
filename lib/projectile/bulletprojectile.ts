@@ -1,5 +1,5 @@
-import { Projectile } from './projectile';
-import { Collider } from '../tokens/collider';
+import { Projectile } from './projectile.js';
+import { Collider } from '../tokens/collider.js';
 
 // Añadimos colisionador y efecto tras impacto
 

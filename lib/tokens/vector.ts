@@ -1,4 +1,4 @@
-import { Point } from '../point/point';
+import { Point } from '../point/point.js';
 
 export class IntersectionPoint extends Point {
     tokens: any[];

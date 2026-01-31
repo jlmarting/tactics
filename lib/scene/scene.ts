@@ -1,10 +1,10 @@
-import { Point } from '../point/point';
-import { Rectangle } from '../tokens/rectangle';
-import { ColliderToken, Collider } from '../tokens/collider';
-import { ImgToken } from '../tokens/image';
-import { Effects } from '../projectile/effects';
-import { IToken } from '../tokens/itoken';
-import { ViewPort } from './viewport';
+import { Point } from '../point/point.js';
+import { Rectangle } from '../tokens/rectangle.js';
+import { ColliderToken, Collider } from '../tokens/collider.js';
+import { ImgToken } from '../tokens/image.js';
+import { Effects } from '../projectile/effects.js';
+import { IToken } from '../tokens/itoken.js';
+import { ViewPort } from './viewport.js';
 
 /**
  * Clase Scene: Gestiona el renderizado (draw loop), el estado de la cámara (ViewPort)

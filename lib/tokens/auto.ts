@@ -1,4 +1,4 @@
-import { ColliderToken } from './collider';
+import { ColliderToken } from './collider.js';
 
 // Token con movimiento programado (sigue comandos del plan)
 export class AutoToken extends ColliderToken {

@@ -1,7 +1,7 @@
 // Token poligonal. Sin imagen. Se forma con la unión de una sucesión de puntos ordenada
-import { Point } from "../point/point";
-import { CursorPoint } from '../point/cursorpoint';
-import { Vector } from './vector';
+import { Point } from "../point/point.js";
+import { CursorPoint } from '../point/cursorpoint.js';
+import { Vector } from './vector.js';
 
 export class WireToken extends CursorPoint {
     points: Point[];

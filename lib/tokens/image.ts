@@ -1,7 +1,7 @@
 // Token vinculado a una imagen
-import { Point } from "../point/point";
-import { CursorPoint } from "../point/cursorpoint";
-import { IToken } from "./itoken";
+import { Point } from "../point/point.js";
+import { CursorPoint } from "../point/cursorpoint.js";
+import { IToken } from "./itoken.js";
 
 export class ImgToken extends CursorPoint implements IToken {
     

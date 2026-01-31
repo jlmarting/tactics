@@ -1,5 +1,5 @@
-import { ColliderToken } from "./collider";
-import { BulletProjectile } from '../projectile/bulletprojectile';
+import { ColliderToken } from "./collider.js";
+import { BulletProjectile } from '../projectile/bulletprojectile.js';
 
 // Shooter: un tanque que dispara ColliderToken + shoot
 

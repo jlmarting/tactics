@@ -1,17 +1,17 @@
 // Creación de escenario: objetos a representar, los empilamos en arrTokens de la escena
 // y lanzamos el primer drawscene
-import { Point } from "./point/point";
-import { Rectangle } from "./tokens/rectangle"
-import { ImgToken } from './tokens/image';
-import { Collider, ColliderToken } from './tokens/collider';
-import { Projectile } from './projectile/projectile';
-import { Scene } from './scene/scene';
-import { Engine } from './engine/engine';
-import { Control } from './ui/control';
-import { Editor } from './editor/editor';
-import { WireToken } from './tokens/wire';
-import { Shooter } from './tokens/shooter';
-import { AutoToken } from './tokens/auto';
+import { Point } from "./point/point.js";
+import { Rectangle } from "./tokens/rectangle.js"
+import { ImgToken } from './tokens/image.js';
+import { Collider, ColliderToken } from './tokens/collider.js';
+import { Projectile } from './projectile/projectile.js';
+import { Scene } from './scene/scene.js';
+import { Engine } from './engine/engine.js';
+import { Control } from './ui/control.js';
+import { Editor } from './editor/editor.js';
+import { WireToken } from './tokens/wire.js';
+import { Shooter } from './tokens/shooter.js';
+import { AutoToken } from './tokens/auto.js';
 
 export class TText {
     id: string;
@@ -52,7 +52,7 @@ export class Tactics {
     }
 }
 
-import { Effects as EffectsModule } from './projectile/effects';
+import { Effects as EffectsModule } from './projectile/effects.js';
 export const Effects = new EffectsModule();
 
 const theScene = new Scene("tactics");

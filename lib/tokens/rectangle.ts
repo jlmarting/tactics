@@ -1,7 +1,7 @@
-import { CursorPoint } from '../point/cursorpoint';
-import { WireToken } from './wire';
-import { Collider } from './collider';
-import { Point } from '../point/point';
+import { CursorPoint } from '../point/cursorpoint.js';
+import { WireToken } from './wire.js';
+import { Collider } from './collider.js';
+import { Point } from '../point/point.js';
 
 export class Rectangle extends CursorPoint {
     w: number;

@@ -1,4 +1,4 @@
-import { Point } from '../point/point';
+import { Point } from '../point/point.js';
 
 // Proyectil básico (sin impacto)
 export class Projectile extends Point {

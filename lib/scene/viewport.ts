@@ -1,6 +1,6 @@
-import { Point } from "../point/point";
-import { ImgToken } from "../tokens/image";
-import { Rectangle } from "../tokens/rectangle";
+import { Point } from "../point/point.js";
+import { ImgToken } from "../tokens/image.js";
+import { Rectangle } from "../tokens/rectangle.js";
 
 export class ViewPort extends Point {
     
