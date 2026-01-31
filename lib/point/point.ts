@@ -25,42 +25,5 @@ export class Point {
         return { "x": Math.round(this.x), "y": Math.round(this.y) }
     }
 
-    draw(lColor,fColor, self){
-        if(this.config == undefined){          
-            this.config = {};
-        }
-        
-        if(this.config.color == undefined){
-
-            if(lColor==undefined){
-                lColor = "red";
-            }
-            
-            if(fColor==undefined){
-                fColor = "white";
-            }
-        }else{
-            lColor = "white";
-            fColor = this.config.color;
-        }
-        
-                
-        self.ctx.beginPath();    
-        self.ctx.strokeStyle = lColor;
-        self.ctx.fillStyle = fColor;   
-
-        if(this.config.position == 'relative'){
-            self.ctx.fillRect(this.x+self.x, this.y+self.y, 4,4);
-            self.ctx.fillText('*('+this.x +',' + this.y+')',this.x+self.x, this.y+self.y);                
-        }else{
-            self.ctx.fillRect(this.x, this.y, 2,2);   
-            self.ctx.fillText('**('+this.x +',' + this.y+')',Math.round(this.x), Math.round(this.y));             
-        }
-
-        self.ctx.stroke();    
-    }
     
-    getRelPos = function(){
-        return {x:Math.round(this.x+self.x), y:Math.round(this.y+self.y)};
-    }
 }

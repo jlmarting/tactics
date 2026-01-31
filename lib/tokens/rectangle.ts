@@ -4,60 +4,64 @@ import { Collider } from './collider';
 import { Point } from '../point/point';
 
 //x,y: coordenadas centro, w,h:width, height
-export const Rectangle = function(x,y,w,h){
-    CursorPoint.call(this,x,y,0);
-    this.w=w;
-    this.h=h;
-    this.wire = new WireToken("wire_" + this.id, x, y);
-    //this.wire.load(new CursorPoint(x,y,0));
-    this.wire.load(new CursorPoint(x+w/2, y+h/2,0));
-    this.wire.load(new CursorPoint(x+w/2,y-h/2,0));
-    this.wire.load(new CursorPoint(x-w/2, y-h/2,0));
-    this.wire.load(new CursorPoint(x+w/2,y+h/2,0));
-}
+export class Rectangle extends CursorPoint {
+    w: number;
+    h: number;
+    wire: WireToken;
 
-Rectangle.prototype.placeAt = function(x,y){
-    CursorPoint.prototype.placeAt.call(this,x,y);
-}
+    constructor(x: number, y: number, w: number, h: number) {
+        super(x, y, 0);
+        this.w = w;
+        this.h = h;
+        this.wire = new WireToken("wire_" + this.id, x, y);
+        //this.wire.load(new CursorPoint(x,y,0));
+        this.wire.load(new CursorPoint(x + w / 2, y + h / 2, 0));
+        this.wire.load(new CursorPoint(x + w / 2, y - h / 2, 0));
+        this.wire.load(new CursorPoint(x - w / 2, y - h / 2, 0));
+        this.wire.load(new CursorPoint(x + w / 2, y + h / 2, 0));
+    }
 
-Rectangle.prototype.isCollisioning = function(otherElement){
-    if(otherElement instanceof Rectangle == true){
-        var intersections = this.wire.getIntersections(otherElement.wire);
-        if(intersections.length > 0){
-            return true;
-        }else{
-            return false;
-        }
-    }else{
-        if(s instanceof Collider == true){
-            //TODO colisión con Collider
-            return false;
-        }else{
-            return false;
+    public placeAt(x: number, y: number) {
+        super.placeAt(x, y);
+    }
+
+    public isCollisioning(otherElement: any):boolean {
+        if (otherElement instanceof Rectangle) {
+            var intersections = this.wire.getIntersections(otherElement.wire);
+            if (intersections.length > 0) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            if (otherElement instanceof Collider) {
+                //TODO colisión con Collider
+                return false;
+            } else {
+                return false;
+            }
         }
     }
-}
 
-Rectangle.prototype.isInside = function(x,y){
-    var rw = Math.round(this.w/2);
-    var rh = Math.round(this.h/2);
-    return !((x < this.x-rw)||(x > this.x+rw)||(y < this.y-rh)||(y > this.y+rh))
-}
+    public isInside(x: number, y: number): boolean {
+        var rw = Math.round(this.w / 2);
+        var rh = Math.round(this.h / 2);
+        return !((x < this.x - rw) || (x > this.x + rw) || (y < this.y - rh) || (y > this.y + rh));
+    }
 
-Rectangle.prototype.move =  function(cmd){    
-    var dXY = CursorPoint.prototype.move.call(this,cmd,5);
-    console.log('rectangle move ' + cmd + ' ' + dXY.x + ' ' + dXY.y);  
-    this.wire.move(cmd,5);
-    return dXY;
-};    
+    public move(cmd: string, displ: number) {
+        var dXY = super.move(cmd, 5);
+        console.log('rectangle move ' + cmd + ' ' + dXY.x + ' ' + dXY.y);
+        this.wire.move(cmd, 5);
+        return dXY;
+    }
 
+    // public getRelPos() {
+    //     return super.getRelPos();
+    // }
 
-
-Rectangle.prototype.getRelPos = function(){
-    return Point.prototype.getRelPos.call(this,this.x,this.y);
-}
-
-Rectangle.prototype.draw = function(ctx,lColor,fColor){
-    Point.prototype.draw.call(ctx);           
-    this.wire.draw(ctx);     
+    draw(ctx: any) {
+        super.draw(ctx);
+        this.wire.draw(ctx);
+    }
 }

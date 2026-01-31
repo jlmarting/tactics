@@ -2,7 +2,7 @@ import { Point } from "../point/point";
 import { ImgToken } from "../tokens/image";
 import { Rectangle } from "../tokens/rectangle";
 
-class ViewPort extends Point{    
+export class ViewPort extends Point{    
     
     config: any;
     viewPort: any;

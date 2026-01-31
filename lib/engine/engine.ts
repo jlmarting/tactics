@@ -1,86 +1,83 @@
 import { AutoToken } from '../tokens/auto';
-import { BulletProjectile } from '../bulletprojectile';
 import { WireToken } from '../tokens/wire';
 import { Projectile} from '../projectile/projectile';
 import { Shooter } from '../tokens/shooter';
-import { Effects } from '../tactics';
-import { IToken } from '../tokens/itoken';
 
-export const Engine = function(scene){
+import { Scene } from '../scene/scene';
+import { IToken } from '../tokens/interfaces/itoken';
+import { BulletProjectile } from '../projectile/bulletprojectile';
 
+export class Engine{
+
+    private scene: Scene;
+    private mapkey: [];
+        
+    constructor(scene: Scene){
         this.scene = scene;
         this.mapkey = [];
-        
-        this.start = function(){
-                setInterval(function(){
-                        this.resolver(1);
-                        this.automat();}.bind(this), 16);
-        }
+    }
+    
 
-        var self = this;
+    
+    public Start(){
+            setInterval(function(){
+                    this.resolver(1);
+                    this.automat();}.bind(this), 16);
+    }
 
-        //Movimientos automáticos (autopilot, balas,...)
-        this.automat = function(){
-            scene.arrTokens.forEach(function(t: IToken){  //Según el tipo de token realizaremos unas u otras opciones                                                                  
-                
-                if (t.delete) {
-                    var tokenIndex = scene.arrTokens.findIndex(function(element){
-                        return element.id == t.id;
-                    });                                                                   
-                    scene.arrTokens.splice(tokenIndex,1);
-                    scene.tokenIndex = scene.arrTokens.findIndex(function(element){
-                        return element.id == scene.tokenId;
-                    });
-                }            
-                
-                
-                
+    
+    //Movimientos automáticos (autopilot, balas,...)
+    public Automat(){        
+
+        this.scene.deleteMarkedTokens();
+
+        this.scene.getWorldTokens().forEach(
+
+            t => {
+
                 if (t instanceof AutoToken){   
                     let tk: AutoToken = t;                            
                     //self.orders.push({cmd:'autopilot',id:t.id, displ: t.displ, timestamp: window.performance.now()});
-                    tk.autopilot(scene.arrTokens);                                
-                }
-                
+                    tk.autopilot(this.scene.getWorldTokens());                                
+                    }
+            
                 if (t instanceof Projectile){    
                     
                     if (t instanceof BulletProjectile){                                                                           
                         //self.orders.push({cmd:'shot',id:t.id, displ: t.displ, timestamp: window.performance.now()});
-                        let tk: BulletProjectile= t;                            
-                        var d = tk.shot(scene.arrTokens);                  
+                        let tk: BulletProjectile = t;                            
+                        tk.shot(this.scene.getWorldTokens());                  
                     }                          
                 }
-
-                          
+                        
                 //Prueba intersección wiretoken del token seleccionado en tiempo real           
-                if((t instanceof WireToken)&&(t.id == scene.getSelectedToken().id)){
+                if((t instanceof WireToken)&&(t.id == this.scene.getSelectedToken().id)){
                     var iPoints = [];
-                    scene.buffer.intersections = [];
-                    for(var i = 0; i<scene.arrTokens.length;i++){
-                        var element = scene.arrTokens[i];
+                    this.scene.buffer.intersections = [];
+                    for(var i = 0; i<this.scene.getWorldTokens().length;i++){
+                        var element = this.scene.getWorldTokens()[i];
                         if(element instanceof WireToken){
                             let tk: WireToken = t;                            
                             iPoints = tk.getIntersections(element);
                         }                        
-                        iPoints.forEach(e =>{console.log(e);scene.buffer.intersections.push(e)});
+                        iPoints.forEach(e =>{console.log(e);this.scene.buffer.intersections.push(e)});
                     } 
                     //Pasamos los vértices al mensaje de la escena
-                    scene.message = `# ${t.config.message} # ${t.id} Centro:-> [${t.x},${t.y}] Vértices: `;
+                    this.scene.message = `# ${t.config.message} # ${t.id} Centro:-> [${t.x},${t.y}] Vértices: `;
                     t.points.forEach(element => {
-                        scene.message = scene.message + `[${element.x} , ${element.y}] `;
+                        this.scene.message = this.scene.message + `[${element.x} , ${element.y}] `;
                     });
                     
 
                 }
-                if (scene.buffer.intersections.length>0){
+                if (this.scene.buffer.intersections.length>0){
                     //Marcamos el token para indicar que hay colisión
                     t.config.enabled = false;
-                }    
-
-            });  
-            
-  
-            return window.performance.now();
-        }
+                }   
+            }
+        )   
+        return window.performance.now();
+    }
 
 
         // Resolver

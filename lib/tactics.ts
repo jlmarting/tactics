@@ -12,6 +12,7 @@ import { Editor } from './editor/editor';
 import { WireToken } from './tokens/wire';
 import { Shooter } from './tokens/shooter';
 import { AutoToken } from './tokens/auto';
+import { ColliderToken } from "./tokens/colliderToken";
 
 
 export const Tactics = function(){
@@ -55,7 +56,8 @@ export const Tactics = function(){
 
 
 
-var theScene = new Scene("tactics", ['general', 'linerectangle', '2lines', 'imagebrick', 'wirebrick', 'rectangles', 'textTest', 'empty']);
+//var theScene = new Scene("tactics", ['general', 'linerectangle', '2lines', 'imagebrick', 'wirebrick', 'rectangles', 'textTest', 'empty']);
+var theScene = new Scene("tactics");
 var theTactics = new Tactics();
 
 

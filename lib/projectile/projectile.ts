@@ -1,5 +1,5 @@
-import { Point } from './point/point';
-import { Tactics } from './tactics';
+import { Point } from '../point/point'
+import { Tactics } from '../tactics';
 
 
 // Proyectil básico (sin impacto)

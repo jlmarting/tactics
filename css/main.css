@@ -8,6 +8,10 @@ body {
 
 #tactics {
     background-color: white;
+    width: 98%;
+    height: 98%;
+    border: 2px dotted green;
+    border-radius: 7px;
 }
 
 
