@@ -36,16 +36,13 @@ export class ImgToken extends CursorPoint implements IToken {
         return super.move(cmd, displ);
     }
 
-    draw(ctx: CanvasRenderingContext2D) {
+    draw(ctx: CanvasRenderingContext2D, lColor?: string, fColor?: string, offset?: { x: number, y: number }) {
         if (!ctx) return -1;
 
         let pos;
         if (this.config.position === 'relative') {
-            // Nota: getRelPos en Point parece estar roto o depender de una global 'self'
-            // Por ahora usaremos una lógica coherente si es posible o asumiremos que se le pasa el contexto adecuado
-            // En Scene.ts, el renderizado se encarga de posicionar, pero aquí el token se dibuja a sí mismo.
-            // Para mantener compatibilidad con el código anterior:
-            pos = this.getRelPos();
+            // Usamos el offset proporcionado por la escena (cámara)
+            pos = this.getRelPos(offset);
         } else {
             pos = { x: this.x, y: this.y };
         }

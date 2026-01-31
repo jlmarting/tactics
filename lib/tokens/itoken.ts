@@ -48,6 +48,15 @@ export interface IToken {
     getCenter(): { x: number, y: number };
 
     /**
+     * Dibuja el token en el contexto de canvas.
+     * @param ctx Contexto 2D del canvas.
+     * @param lColor Color de línea.
+     * @param fColor Color de relleno.
+     * @param offset Desplazamiento de cámara.
+     */
+    draw(ctx: CanvasRenderingContext2D, lColor?: string, fColor?: string, offset?: { x: number, y: number }): any;
+
+    /**
      * Ejecuta un movimiento basado en un comando.
      * @param cmd Comando de movimiento ('up', 'down', 'left', 'right', etc.).
      * @param displ Distancia o magnitud del desplazamiento.

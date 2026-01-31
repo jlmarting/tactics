@@ -127,6 +127,9 @@ export class Scene {
 
         // El método drawScene debe estar bindeado para mantener el contexto 'this' en requestAnimationFrame
         this.drawScene = this.drawScene.bind(this);
+
+        // Inicializar controles de la UI
+        this.setupUIControls();
     }
 
     /**
@@ -399,8 +402,8 @@ export class Scene {
 
         const tokenSelector = getElem('tokens') as HTMLSelectElement;
         if (tokenSelector) {
-            // Recargar la lista de tokens disponibles al hacer clic (desplegar)
-            tokenSelector.onclick = () => {
+            // Recargar la lista de tokens disponibles antes de desplegar
+            tokenSelector.onmousedown = () => {
                 this.reloadSel();
             };
 
