@@ -5,63 +5,103 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="stylesheet" href="css/main.css">
-    <title>Tactics</title>
+    <title>Tactics - 2D Engine</title>
 </head>
 <body>
     <div id="container">
         <canvas id="tactics">
-            <img src="img/tactics.jpg" alt="" size="50">              
+            <img src="img/tactics.jpg" alt="Tactics Logo" size="50">
         </canvas>
 
-        <textarea id="info"> </textarea>     
+        <!-- Panel de Información Superior (Persiana) -->
+        <div id="info-panel" class="panel top-panel folded">
+            <div class="panel-header">
+                <span class="panel-title">Estado del Motor</span>
+                <button id="toggle-info" class="toggle-btn">▲</button>
+            </div>
+            <div class="panel-content">
+                <div id="status-indicators">
+                    <p id="info-tokens">TOKENS: - / -</p>
+                    <p id="info-fps">FPS: - / -</p>
+                    <p id="info-cycle">Ciclo: -ms / -ms</p>
+                    <p id="info-engine">Log: -</p>
+                </div>
+                <div id="shortcuts">
+                    <hr>
+                    <strong>Atajos de Teclado:</strong>
+                    <ul>
+                        <li><kbd>WASD / Flechas</kbd>: Mover / Girar</li>
+                        <li><kbd>Espacio</kbd>: Disparar</li>
+                        <li><kbd>N</kbd>: Crear Polígono (Editor)</li>
+                        <li><kbd>D</kbd>: Borrar trazado</li>
+                        <li><kbd>S</kbd>: Demo Línea</li>
+                    </ul>
+                </div>
+                <div id="scene-message"></div>
+            </div>
+        </div>
     
-        <div id="control">
-                <ul>
-                    <li><button id="stopAutomat">Stop/Go</button></li>
-                    <li><input type="checkbox" id="autoFPS"/><label for="autoFPS">Auto FPS</label>  </li>
-                    <li><input type="checkbox" id="lines"/><label for="lines">View Lines</label>  </li>
-                    <li><input type="checkbox" id="colliders"/><label for="colliders">View Colliders</label>  </li>
-                    <li><input type="checkbox" id="collision"/><label for="collision">Detect Collision</label>  </li>
-                    <li><input type="checkbox" id="ids"/><label for="ids">View IDs</label>  </li>
-                    <li><input type="checkbox" id="viewport"/><label for="viewport">Enable view clipping</label>  </li>
-                    <li>
-                        <input type="text" id="viewportwidth"/><label for="viewportwidth">Viewport Width</label>
-                        <input type="text" id="viewportheight"/><label for="viewportheight">Viewport Height</label>  
-                    </li>
-                    <li><input type="text" id="fps"/><label for="fps">FPS</label>  </li>
-                    <li>
-                        <select id="effects">                    
-                        </select>
-                            <label for="effects">Select Bullet Effect</label>
-                    </li>
-                    <li>
-                        <select id="scene">                    
-                        </select>
-                            <label for="scenes">Select Scene</label>
-                    </li>
-                    <li>
-                        <select id="tokens">                    
-                        </select>
-                            <label for="tokens">Select Token</label>
-                    </li>
-                    <li><button id="zoomin">zoom +</button><button id="zoomout">zoom -</button></li>
-                </ul>                
+        <!-- Panel de Control Lateral (Persiana) -->
+        <div id="side-panel" class="panel right-panel folded">
+            <div class="panel-header">
+                <button id="toggle-side" class="toggle-btn">◀</button>
+                <span class="panel-title">Opciones de Escena</span>
+            </div>
+            <div class="panel-content">
+                <div id="control">
+                    <ul>
+                        <li><button id="stopAutomat" class="action-btn">Stop/Go</button></li>
+                        <li>
+                            <div class="control-group">
+                                <input type="checkbox" id="autoFPS"/><label for="autoFPS">Auto FPS</label>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="control-group">
+                                <input type="checkbox" id="lines"/><label for="lines">Ver Rejilla</label>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="control-group">
+                                <input type="checkbox" id="colliders"/><label for="colliders">Ver Colisionadores</label>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="control-group">
+                                <input type="checkbox" id="viewport"/><label for="viewport">Habilitar Viewport</label>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="control-group">
+                                <input type="checkbox" id="collision"/><label for="collision">Detectar Colisión</label>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="control-group">
+                                <input type="checkbox" id="ids"/><label for="ids">Ver IDs / Salud</label>
+                            </div>
+                        </li>
+                        <li>
+                            <label>Zoom</label>
+                            <div class="btn-group">
+                                <button id="zoomin">+</button>
+                                <button id="zoomout">-</button>
+                            </div>
+                        </li>
+                        <li>
+                            <label for="effects">Efecto de Bala</label>
+                            <select id="effects"></select>
+                        </li>
+                        <li>
+                            <label for="tokens">Seleccionar Token</label>
+                            <select id="tokens"></select>
+                        </li>
+                    </ul>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- <script src="lib/token.js"></script>    
-    <script src="lib/tokens/image.js"></script>   
-    <script src="lib/tokens/collider.js"></script>   
-    <script src="lib/tokens/auto.js"></script> 
-    <script src="lib/tokens/shooter.js"></script>  
-    <script src="lib/tokens/vector.js"></script>    
-    <script src="lib/tokens/wire.js"></script> 
-    <script src="lib/tokens/rectangle.js"></script> 
-    <script src="lib/scene.js"></script>
-    <script src="lib/control.js"></script>
-    <script src="lib/editor.js"></script>
-    <script src="lib/engine.js"></script> -->
     <script type="module" src="lib/tactics.js"></script>
-    <!--script src="lib/scenes/example1.js"></script-->
 </body>
 </html>

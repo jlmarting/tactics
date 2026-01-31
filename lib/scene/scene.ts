@@ -276,11 +276,21 @@ export class Scene {
         }
 
         // Actualizar el panel de información en el DOM
-        const infoElem = document.getElementById('info');
-        if (infoElem instanceof HTMLTextAreaElement) {
-            infoElem.value = `TOKENS(TOTAL/DRAWED): [${this.arrTokens.length} / ${this.arr.length}] FPS(config/real): [${this.fps} / ${realFPS}]\n` +
-                `Draw cycle (config/real): [${Math.round(1000 / this.fps)}ms / ${Math.round(averageInterval)}ms] ${this.engineInfo}\n${this.message}`;
-        }
+        // Actualización de indicadores de la UI
+        const infoTokens = document.getElementById('info-tokens');
+        if (infoTokens) infoTokens.innerText = `TOKENS: [${this.arrTokens.length} total / ${this.arr.length} render]`;
+
+        const infoFPS = document.getElementById('info-fps');
+        if (infoFPS) infoFPS.innerText = `FPS: [${this.fps} cfg / ${realFPS} real]`;
+
+        const infoCycle = document.getElementById('info-cycle');
+        if (infoCycle) infoCycle.innerText = `Ciclo: [${Math.round(1000 / this.fps)}ms cfg / ${Math.round(averageInterval)}ms real]`;
+
+        const infoEngine = document.getElementById('info-engine');
+        if (infoEngine) infoEngine.innerText = `Log: ${this.engineInfo}`;
+
+        const sceneMsg = document.getElementById('scene-message');
+        if (sceneMsg) sceneMsg.innerText = this.message;
 
         // Solicitar el siguiente frame
         requestAnimationFrame(this.drawScene);
@@ -308,31 +318,34 @@ export class Scene {
      */
     drawGrid() {
         this.ctx.save();
-        this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+        this.ctx.strokeStyle = 'rgba(0, 255, 65, 0.2)';
         this.ctx.lineWidth = 1;
         const gran = this.config.grid.granularity;
-        const gridW = 1900;
-        const gridH = 1200;
+        const gridW = 3000;
+        const gridH = 3000;
 
-        // Ajuste de fase para que la rejilla parezca infinita y estática al mover la cámara
-        const dx = (Math.round((this.x - gridW / 2) / gran) * gran) + (gridW / 2);
-        const dy = (Math.round((this.y - gridH / 2) / gran) * gran) + (gridH / 2);
+        const startX = Math.floor((-this.x - gridW/2) / gran) * gran;
+        const endX = startX + gridW;
+        const startY = Math.floor((-this.y - gridH/2) / gran) * gran;
+        const endY = startY + gridH;
 
-        for (let col = 0; col <= Math.round(gridW / gran); col++) {
-            for (let row = 0; row <= Math.round(gridH / gran); row++) {
-                const x = (col * gran) - dx;
-                const y = (row * gran) - dy;
-                const rx = x + this.x;
-                const ry = y + this.y;
+        this.ctx.beginPath();
+        for (let x = startX; x <= endX; x += gran) {
+            this.ctx.moveTo(x + this.x, startY + this.y);
+            this.ctx.lineTo(x + this.x, endY + this.y);
+        }
+        for (let y = startY; y <= endY; y += gran) {
+            this.ctx.moveTo(startX + this.x, y + this.y);
+            this.ctx.lineTo(endX + this.x, y + this.y);
+        }
+        this.ctx.stroke();
 
-                if ((x % (gran * 5) === 0) && (y % (gran * 5) === 0)) {
-                    this.ctx.fillStyle = 'green';
-                    this.ctx.fillRect(rx, ry, 5, 5);
-                    this.ctx.fillText(`(${x},${y})`, rx + 15, ry - 5);
-                } else {
-                    this.ctx.fillStyle = 'rgba(0, 255, 0, 0.1)';
-                    this.ctx.fillRect(rx, ry, 1, 1);
-                }
+        // Marcas de coordenadas
+        this.ctx.fillStyle = 'rgba(0, 255, 65, 0.5)';
+        this.ctx.font = '10px Arial';
+        for (let x = startX; x <= endX; x += gran * 5) {
+            for (let y = startY; y <= endY; y += gran * 5) {
+                this.ctx.fillText(`(${x},${y})`, x + this.x + 2, y + this.y - 2);
             }
         }
         this.ctx.restore();
@@ -385,6 +398,23 @@ export class Scene {
             viewport.onchange = () => { this.viewPort.enabled = viewport.checked; viewport.blur(); };
         }
 
+        const collision = getElem('collision') as HTMLInputElement;
+        if (collision) {
+            collision.onchange = () => {
+                const selected = this.getSelectedToken();
+                if (selected && selected.collider) {
+                    selected.collider.config.enabled = collision.checked;
+                }
+                collision.blur();
+            };
+        }
+
+        const viewIds = getElem('ids') as HTMLInputElement;
+        if (viewIds) {
+            viewIds.checked = this.config.viewIds;
+            viewIds.onchange = () => { this.config.viewIds = viewIds.checked; viewIds.blur(); };
+        }
+
         const stopButton = getElem('stopAutomat');
         if (stopButton) {
             stopButton.onclick = () => { this.pause = !this.pause; stopButton.blur(); };
@@ -413,6 +443,25 @@ export class Scene {
                 if (this.setToken(sel)) {
                     tokenSelector.blur();
                 }
+            };
+        }
+
+        // Toggles de Persiana
+        const toggleInfo = getElem('toggle-info');
+        const infoPanel = getElem('info-panel');
+        if (toggleInfo && infoPanel) {
+            toggleInfo.onclick = () => {
+                infoPanel.classList.toggle('folded');
+                toggleInfo.innerText = infoPanel.classList.contains('folded') ? '▼' : '▲';
+            };
+        }
+
+        const toggleSide = getElem('toggle-side');
+        const sidePanel = getElem('side-panel');
+        if (toggleSide && sidePanel) {
+            toggleSide.onclick = () => {
+                sidePanel.classList.toggle('folded');
+                toggleSide.innerText = sidePanel.classList.contains('folded') ? '◀' : '▶';
             };
         }
     }

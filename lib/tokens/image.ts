@@ -54,8 +54,8 @@ export class ImgToken extends CursorPoint implements IToken {
         if (this.img !== undefined) {
             ctx.translate(pos.x, pos.y);
             ctx.rotate(this.rad);
-            ctx.translate(-(pos.x), -(pos.y));
-            ctx.drawImage(this.img, posImg.x, posImg.y);
+            // Dibujamos centrando la imagen respecto al punto de traslación
+            ctx.drawImage(this.img, -(this.w / 2), -(this.h / 2));
             ctx.restore();
 
             // Referencia a config global? El código original usaba self.config['viewIds']

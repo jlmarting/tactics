@@ -1,33 +1,186 @@
+:root {
+    --bg-dark: rgba(20, 20, 20, 0.85);
+    --accent: #00ff41;
+    --text-color: #00ff41;
+    --border-color: #00ff41;
+    --border-width: 2px;
+    --radius: 12px;
+    --shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+}
+
 body {
-    background-color: blue;
+    background-color: #1a1a1a;
+    margin: 0;
+    font-family: 'Courier New', Courier, monospace;
+    color: var(--text-color);
+    overflow: hidden;
 }
 
 #container {   
-    overflow:hidden;
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
 }
 
 #tactics {
-    background-color: white;
+    background-color: #000;
+    display: block;
 }
 
-
-#info {
-    position:absolute;
-    width:900px;
-    top:0;
-    left:0;
-    color: green;
-    background-color: black;
-    font-size: 16px;
+/* Estilos de Panel Generales */
+.panel {
+    position: absolute;
+    background: var(--bg-dark);
+    border: var(--border-width) solid var(--border-color);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    z-index: 100;
+    overflow: hidden;
 }
 
-#control{
-    position: absolute;    
-    top:30px;
-    right:0;
-    border: 1px dashed red;    
-    width: 300px; 
-    background: black;
-    opacity: 0.7;
-    color:green;   
+.panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 15px;
+    background: rgba(0, 255, 65, 0.1);
+    cursor: default;
+}
+
+.panel-title {
+    font-weight: bold;
+    font-size: 14px;
+    text-transform: uppercase;
+}
+
+.panel-content {
+    padding: 15px;
+}
+
+.toggle-btn {
+    background: none;
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    padding: 2px 6px;
+    transition: background 0.3s;
+}
+
+.toggle-btn:hover {
+    background: rgba(0, 255, 65, 0.2);
+}
+
+/* Panel Superior (Info) */
+.top-panel {
+    top: 10px;
+    left: 10px;
+    width: 450px;
+}
+
+.top-panel.folded {
+    transform: translateY(-80%);
+}
+
+.top-panel.folded .panel-content {
+    opacity: 0;
+}
+
+/* Panel Lateral (Control) */
+.right-panel {
+    top: 10px;
+    right: 10px;
+    width: 250px;
+}
+
+.right-panel.folded {
+    transform: translateX(85%);
+}
+
+.right-panel.folded .panel-content {
+    opacity: 0;
+}
+
+/* Elementos de Control */
+#control ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#control li {
+    margin-bottom: 12px;
+}
+
+.control-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.action-btn {
+    width: 100%;
+    padding: 8px;
+    background: var(--accent);
+    color: #000;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.1s, background 0.2s;
+}
+
+.action-btn:active {
+    transform: scale(0.95);
+}
+
+.btn-group {
+    display: flex;
+    gap: 5px;
+    margin-top: 5px;
+}
+
+.btn-group button {
+    flex: 1;
+    padding: 5px;
+    background: none;
+    border: 1px solid var(--border-color);
+    color: var(--accent);
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+select {
+    width: 100%;
+    background: #000;
+    color: var(--accent);
+    border: 1px solid var(--border-color);
+    padding: 5px;
+    margin-top: 5px;
+    border-radius: 4px;
+}
+
+kbd {
+    background: #333;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-size: 11px;
+    color: #fff;
+}
+
+hr {
+    border: 0;
+    border-top: 1px solid rgba(0, 255, 65, 0.3);
+    margin: 10px 0;
+}
+
+#scene-message {
+    font-size: 12px;
+    margin-top: 10px;
+    color: #aaa;
+    max-height: 60px;
+    overflow-y: auto;
 }

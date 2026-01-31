@@ -22,6 +22,9 @@ Este documento detalla el análisis del estado actual del repositorio, identific
 *   **Estado de Refactorización Inconsistente:** El proyecto se encontraba en una fase de transición "híbrida" inestable. Como parte de este análisis, se ha avanzado significativamente en:
     *   La conversión de los componentes principales (`Engine`, `Scene`, `ImgToken`, `ColliderToken`, `WireToken`, etc.) a clases puras de TypeScript.
     *   La implementación de **ES Modules** nativos, permitiendo que la aplicación corra directamente en navegadores modernos sin necesidad de empaquetadores complejos en esta fase.
+    *   **Rediseño de la Interfaz de Usuario**: Se ha implementado un sistema de "persianas" reactivas para los paneles de información y control, mejorando la estética con un diseño moderno (esquinas redondeadas, bordes acentuados, transiciones suaves).
+    *   **Correcciones de Renderizado**: Se ha resuelto el desajuste crítico entre imágenes y colisionadores corrigiendo la lógica de traslación/rotación en el canvas.
+    *   **Mejoras en Controles**: El selector de tokens ahora es dinámico y reactivo, y la rejilla de la escena se dibuja con líneas reales para mejor referencia espacial.
     *   La limpieza de gran parte del código comentado y la unificación de la jerarquía de herencia.
 *   **Acoplamiento y Variables Globales:** El sistema depende críticamente de variables globales como `theScene`, `theToken` y `theTactics`. Esto dificulta la modularización real, el testeo unitario y la posibilidad de instanciar múltiples motores o escenas.
 *   **Código Muerto y Desorden:** Gran cantidad de código comentado y lógica redundante en los archivos principales. Esto aumenta la carga cognitiva para cualquier desarrollador que intente entender el flujo.
