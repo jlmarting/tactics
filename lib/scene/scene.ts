@@ -314,37 +314,49 @@ export class Scene {
     }
 
     /**
-     * Dibuja una cuadrícula de referencia que se desplaza con la cámara.
+     * Dibuja una cuadrícula de referencia infinita que se desplaza con la cámara.
+     * Utiliza coordenadas fijas para las etiquetas para evitar saltos visuales.
      */
     drawGrid() {
         this.ctx.save();
         this.ctx.strokeStyle = 'rgba(0, 255, 65, 0.2)';
         this.ctx.lineWidth = 1;
         const gran = this.config.grid.granularity;
-        const gridW = 3000;
-        const gridH = 3000;
+        const scale = this.config.scale;
 
-        const startX = Math.floor((-this.x - gridW/2) / gran) * gran;
-        const endX = startX + gridW;
-        const startY = Math.floor((-this.y - gridH/2) / gran) * gran;
-        const endY = startY + gridH;
+        // Límites visibles en coordenadas de mapa (teniendo en cuenta el zoom)
+        const minX = -this.x;
+        const maxX = (this.w / scale) - this.x;
+        const minY = -this.y;
+        const maxY = (this.h / scale) - this.y;
+
+        const startX = Math.floor(minX / gran) * gran;
+        const endX = Math.ceil(maxX / gran) * gran;
+        const startY = Math.floor(minY / gran) * gran;
+        const endY = Math.ceil(maxY / gran) * gran;
 
         this.ctx.beginPath();
+        // Líneas verticales
         for (let x = startX; x <= endX; x += gran) {
-            this.ctx.moveTo(x + this.x, startY + this.y);
-            this.ctx.lineTo(x + this.x, endY + this.y);
+            this.ctx.moveTo(x + this.x, minY + this.y);
+            this.ctx.lineTo(x + this.x, maxY + this.y);
         }
+        // Líneas horizontales
         for (let y = startY; y <= endY; y += gran) {
-            this.ctx.moveTo(startX + this.x, y + this.y);
-            this.ctx.lineTo(endX + this.x, y + this.y);
+            this.ctx.moveTo(minX + this.x, y + this.y);
+            this.ctx.lineTo(maxX + this.x, y + this.y);
         }
         this.ctx.stroke();
 
-        // Marcas de coordenadas
+        // Marcas de coordenadas en puntos fijos
         this.ctx.fillStyle = 'rgba(0, 255, 65, 0.5)';
         this.ctx.font = '10px Arial';
-        for (let x = startX; x <= endX; x += gran * 5) {
-            for (let y = startY; y <= endY; y += gran * 5) {
+        const labelStep = gran * 5;
+        const startLabelX = Math.floor(minX / labelStep) * labelStep;
+        const startLabelY = Math.floor(minY / labelStep) * labelStep;
+
+        for (let x = startLabelX; x <= endX; x += labelStep) {
+            for (let y = startLabelY; y <= endY; y += labelStep) {
                 this.ctx.fillText(`(${x},${y})`, x + this.x + 2, y + this.y - 2);
             }
         }
@@ -452,7 +464,7 @@ export class Scene {
         if (toggleInfo && infoPanel) {
             toggleInfo.onclick = () => {
                 infoPanel.classList.toggle('folded');
-                toggleInfo.innerText = infoPanel.classList.contains('folded') ? '▼' : '▲';
+                toggleInfo.innerText = infoPanel.classList.contains('folded') ? '▲' : '▼';
             };
         }
 

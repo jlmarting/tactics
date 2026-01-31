@@ -28,6 +28,25 @@ body {
     display: block;
 }
 
+#status-indicators {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 200;
+    pointer-events: none;
+    text-shadow: 1px 1px 2px #000;
+    font-size: 12px;
+}
+
+#status-indicators p {
+    margin: 2px 0;
+    padding: 2px 6px;
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 4px;
+    display: inline-block;
+    margin-right: 10px;
+}
+
 /* Estilos de Panel Generales */
 .panel {
     position: absolute;
@@ -76,13 +95,13 @@ body {
 
 /* Panel Superior (Info) */
 .top-panel {
-    top: 10px;
+    bottom: 10px;
     left: 10px;
     width: 450px;
 }
 
 .top-panel.folded {
-    transform: translateY(-80%);
+    transform: translateY(calc(100% - 35px));
 }
 
 .top-panel.folded .panel-content {

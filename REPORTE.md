@@ -24,7 +24,8 @@ Este documento detalla el análisis del estado actual del repositorio, identific
     *   La implementación de **ES Modules** nativos, permitiendo que la aplicación corra directamente en navegadores modernos sin necesidad de empaquetadores complejos en esta fase.
     *   **Rediseño de la Interfaz de Usuario**: Se ha implementado un sistema de "persianas" reactivas para los paneles de información y control, mejorando la estética con un diseño moderno (esquinas redondeadas, bordes acentuados, transiciones suaves).
     *   **Correcciones de Renderizado**: Se ha resuelto el desajuste crítico entre imágenes y colisionadores corrigiendo la lógica de traslación/rotación en el canvas.
-    *   **Mejoras en Controles**: El selector de tokens ahora es dinámico y reactivo, y la rejilla de la escena se dibuja con líneas reales para mejor referencia espacial.
+    *   **Mejoras en Controles**: El selector de tokens ahora es dinámico y reactivo.
+    *   **Sistema de Rejilla e Indicadores**: Se implementó una rejilla infinita con etiquetas de coordenadas fijas y estables. Los indicadores de rendimiento (FPS, Tokens) se movieron a un overlay de alta visibilidad.
     *   La limpieza de gran parte del código comentado y la unificación de la jerarquía de herencia.
 *   **Acoplamiento y Variables Globales:** El sistema depende críticamente de variables globales como `theScene`, `theToken` y `theTactics`. Esto dificulta la modularización real, el testeo unitario y la posibilidad de instanciar múltiples motores o escenas.
 *   **Código Muerto y Desorden:** Gran cantidad de código comentado y lógica redundante en los archivos principales. Esto aumenta la carga cognitiva para cualquier desarrollador que intente entender el flujo.

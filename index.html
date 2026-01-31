@@ -13,19 +13,20 @@
             <img src="img/tactics.jpg" alt="Tactics Logo" size="50">
         </canvas>
 
-        <!-- Panel de Información Superior (Persiana) -->
+        <div id="status-indicators">
+            <p id="info-tokens">TOKENS: - / -</p>
+            <p id="info-fps">FPS: - / -</p>
+            <p id="info-cycle">Ciclo: -ms / -ms</p>
+            <p id="info-engine">Log: -</p>
+        </div>
+
+        <!-- Panel de Información Inferior (Persiana) -->
         <div id="info-panel" class="panel top-panel folded">
             <div class="panel-header">
-                <span class="panel-title">Estado del Motor</span>
+                <span class="panel-title">Ayuda / Atajos</span>
                 <button id="toggle-info" class="toggle-btn">▲</button>
             </div>
             <div class="panel-content">
-                <div id="status-indicators">
-                    <p id="info-tokens">TOKENS: - / -</p>
-                    <p id="info-fps">FPS: - / -</p>
-                    <p id="info-cycle">Ciclo: -ms / -ms</p>
-                    <p id="info-engine">Log: -</p>
-                </div>
                 <div id="shortcuts">
                     <hr>
                     <strong>Atajos de Teclado:</strong>
@@ -45,7 +46,7 @@
         <div id="side-panel" class="panel right-panel folded">
             <div class="panel-header">
                 <button id="toggle-side" class="toggle-btn">◀</button>
-                <span class="panel-title">Opciones de Escena</span>
+                <span class="panel-title">Controles</span>
             </div>
             <div class="panel-content">
                 <div id="control">
