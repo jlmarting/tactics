@@ -396,6 +396,22 @@ export class Scene {
         if (zoomout) {
             zoomout.onclick = () => { this.config.scale -= 0.1; this.resize(); zoomout.blur(); };
         }
+
+        const tokenSelector = getElem('tokens') as HTMLSelectElement;
+        if (tokenSelector) {
+            // Recargar la lista de tokens disponibles al hacer clic (desplegar)
+            tokenSelector.onclick = () => {
+                this.reloadSel();
+            };
+
+            // Al seleccionar un token, cambiar el foco
+            tokenSelector.onchange = () => {
+                const sel = tokenSelector.value;
+                if (this.setToken(sel)) {
+                    tokenSelector.blur();
+                }
+            };
+        }
     }
 
     /**
