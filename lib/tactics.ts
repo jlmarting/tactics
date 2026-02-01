@@ -83,7 +83,7 @@ theToken.displ = 5;
 if (theToken.collider) {
     theToken.collider.addSubCollider();
 }
-theToken.config.viewName = true;
+theToken.config.viewName = false;
 theToken.config.selectable = true;
 
 /**
@@ -98,41 +98,41 @@ if (theTactics.config.buildExample === 'general') {
 
     // Bloques de colisión estáticos
     const theBlock4 = new ColliderToken('block4', 150, 680, 0, 'img/concrete_block.png', 237, 150);
-    theBlock4.config.viewName = true;
+    theBlock4.config.viewName = false;
 
     // Tokens controlados por IA (AutoTokens)
     const autoToken1 = new AutoToken('auto1', 550, 670, 0, 'img/token_winter.png', 141, 50);
     autoToken1.plan = ["up", "up", "up", "up", "up", "left", "up", "left"];
     if (autoToken1.collider) autoToken1.collider.addSubCollider();
-    autoToken1.config.viewName = true;
+    autoToken1.config.viewName = false;
     autoToken1.config.selectable = true;
 
     const autoToken2 = new AutoToken('auto2', 150, 340, 0, 'img/token_winter.png', 141, 50);
     autoToken2.plan = ["up", "up", "up", "up", "up", "left", "up", "left"];
-    autoToken2.config.viewName = true;
+    autoToken2.config.viewName = false;
     autoToken2.config.selectable = true;
 
     const autoToken3 = new AutoToken('auto3', 450, 440, 0, 'img/token_winter.png', 141, 50);
     autoToken3.plan = ["up", "up", "rigth", "right", "right", "right"];
-    autoToken3.config.viewName = true;
+    autoToken3.config.viewName = false;
     autoToken3.config.selectable = true;
 
     const autoToken4 = new AutoToken('auto4', 450, 140, 3.1416 / 2, 'img/token.png', 141, 50);
     autoToken4.plan = ["up", "up", "up", "up", "up", "up", "up", "up", "up", "up", "up", "up", "up", "up", "up", "up", "up", "up", "up", "up", "up", "up", "up", "up"];
-    autoToken4.config.viewName = true;
+    autoToken4.config.viewName = false;
     autoToken4.config.selectable = true;
 
     // Estructuras complejas de bloques (muros)
     const theBlock1 = new ColliderToken('block1', 250, 50, 0, 'img/concrete_block.png', 237, 150);
     if (theBlock1.collider) theBlock1.collider.addSubCollider();
-    theBlock1.config.viewName = true;
+    theBlock1.config.viewName = false;
     theBlock1.config.selectable = true;
 
     const theBlock2 = new ColliderToken('block2', 725, 150, 0, 'img/concrete_block.png', 237, 150);
-    theBlock2.config.viewName = true;
+    theBlock2.config.viewName = false;
 
     const theBlock3 = new ColliderToken('block3', 750, 540, 0, 'img/concrete_block.png', 237, 150);
-    theBlock3.config.viewName = true;
+    theBlock3.config.viewName = false;
     theBlock3.config.selectable = true;
 
     // Generación dinámica de muros de ladrillo

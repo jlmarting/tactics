@@ -40,15 +40,15 @@ export class Rectangle extends CursorPoint {
         return !((x < this.x - rw) || (x > this.x + rw) || (y < this.y - rh) || (y > this.y + rh));
     }
 
-    move(cmd: string, displ: number = 5): any {
+    move(cmd: string, displ: number = 5, tokens?: any[], debugMode?: boolean): any {
         const dXY = super.move(cmd, displ);
         console.log('rectangle move ' + cmd + ' ' + dXY.x + ' ' + dXY.y);
-        this.wire.move(cmd, displ);
+        this.wire.move(cmd, displ, tokens, debugMode);
         return dXY;
     }
 
-    draw(ctx: CanvasRenderingContext2D, lColor?: string, fColor?: string, offset?: { x: number, y: number }) {
-        super.draw(ctx, lColor, fColor, offset);
-        this.wire.draw(ctx, undefined, undefined, offset);
+    draw(ctx: CanvasRenderingContext2D, lColor?: string, fColor?: string, offset?: { x: number, y: number }, debugMode?: boolean) {
+        super.draw(ctx, lColor, fColor, offset, debugMode);
+        this.wire.draw(ctx, undefined, undefined, offset, debugMode);
     }
 }

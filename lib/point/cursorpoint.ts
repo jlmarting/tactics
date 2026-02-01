@@ -38,9 +38,11 @@ export class CursorPoint extends Point {
      * Actualiza la posición o rotación basada en un comando.
      * @param cmd Comando ('left', 'right', 'up', 'down').
      * @param displ Magnitud del movimiento (píxeles).
+     * @param tokens Lista de tokens (opcional, no usado en CursorPoint).
+     * @param debugMode Modo debug (opcional, no usado en CursorPoint).
      * @returns Objeto con el desglose del movimiento realizado.
      */
-    move(cmd: string, displ: number) {
+    move(cmd: string, displ: number, tokens?: any[], debugMode?: boolean) {
         switch (cmd) {
             case "left":
                 // Girar a la izquierda (disminuir radianes)

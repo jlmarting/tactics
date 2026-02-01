@@ -32,11 +32,11 @@ export class ImgToken extends CursorPoint implements IToken {
     }
 
     // El método move ya está implementado en CursorPoint, pero podemos sobrescribirlo o usarlo
-    move(cmd: string, displ: number): any {
+    move(cmd: string, displ: number, tokens?: any[], debugMode?: boolean): any {
         return super.move(cmd, displ);
     }
 
-    draw(ctx: CanvasRenderingContext2D, lColor?: string, fColor?: string, offset?: { x: number, y: number }) {
+    draw(ctx: CanvasRenderingContext2D, lColor?: string, fColor?: string, offset?: { x: number, y: number }, debugMode?: boolean) {
         if (!ctx) return -1;
 
         let pos;
@@ -46,8 +46,6 @@ export class ImgToken extends CursorPoint implements IToken {
         } else {
             pos = { x: this.x, y: this.y };
         }
-
-        const posImg = { x: pos.x - (this.w / 2), y: pos.y - (this.h / 2) };
 
         ctx.save();
 
@@ -60,7 +58,7 @@ export class ImgToken extends CursorPoint implements IToken {
 
             // Referencia a config global? El código original usaba self.config['viewIds']
             // Esto es un punto de acoplamiento que debería mejorarse.
-            if (this.config['viewName']) {
+            if (this.config['viewName'] || debugMode) {
                 ctx.font = '14px serif';
                 ctx.fillStyle = this.idColor;
                 ctx.fillText('(' + Math.round(this.x) + ' ,' + Math.round(this.y) + ')', pos.x - 90, pos.y);

@@ -45,15 +45,16 @@ export class Engine {
      * Ejecuta comportamientos programados o automáticos de los tokens en la escena.
      */
     automat() {
-        this.scene.arrTokens.forEach((t: IToken) => {
-            // Eliminar tokens marcados para destrucción (limpieza de memoria)
-            if (t.delete) {
-                const tokenIndex = this.scene.arrTokens.findIndex((element: any) => element.id === t.id);
-                this.scene.arrTokens.splice(tokenIndex, 1);
-                // Sincronizar el índice de selección de la escena
-                this.scene.tokenIndex = this.scene.arrTokens.findIndex((element: any) => element.id === this.scene.tokenId);
-            }
+        // Limpieza de tokens marcados para eliminación
+        const initialCount = this.scene.arrTokens.length;
+        this.scene.arrTokens = this.scene.arrTokens.filter((t: any) => !t.delete);
 
+        if (this.scene.arrTokens.length !== initialCount) {
+            // Sincronizar el índice de selección si hubo cambios
+            this.scene.tokenIndex = this.scene.arrTokens.findIndex((element: any) => element.id === this.scene.tokenId);
+        }
+
+        this.scene.arrTokens.forEach((t: IToken) => {
             // Actualizar tokens con piloto automático
             if (t instanceof AutoToken) {
                 t.autopilot(this.scene.arrTokens);
@@ -99,6 +100,7 @@ export class Engine {
      */
     resolver() {
         const selectedToken = this.scene.arrTokens[this.scene.tokenIndex];
+        const debugMode = this.scene.config.debugMode;
 
         this.mapkey.forEach((cmd) => {
             if (cmd === "fire") {
@@ -117,8 +119,8 @@ export class Engine {
                 // Comandos de movimiento ('up', 'down', 'left', 'right')
                 this.scene.engineInfo = `scene.move -> ${cmd} `;
                 if (selectedToken && typeof selectedToken.move === 'function') {
-                    // El movimiento se delega al objeto, pasando la lista de tokens para verificar colisiones
-                    selectedToken.move(cmd, selectedToken.displ, this.scene.arrTokens);
+                    // El movimiento se delega al objeto, pasando la lista de tokens y el estado debug
+                    selectedToken.move(cmd, selectedToken.displ, this.scene.arrTokens, debugMode);
                 }
             }
         });

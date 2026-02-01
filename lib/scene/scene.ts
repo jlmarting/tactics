@@ -26,8 +26,6 @@ export class Scene {
     arr: any[];
     /** Mapa de teclas/comandos activos. */
     mapkey: any[];
-    /** Estado del proceso de dibujo. */
-    drawing: boolean;
     /** Índice del token que actualmente tiene el foco del usuario. */
     tokenIndex: number;
     /** ID del token seleccionado. */
@@ -38,8 +36,6 @@ export class Scene {
     canvas: HTMLCanvasElement;
     /** Contexto de dibujo 2D. */
     ctx: CanvasRenderingContext2D;
-    /** Pila de órdenes secuenciales. */
-    orders: any[];
     /** Mensaje de estado general de la escena. */
     message: string;
     /** Desplazamiento horizontal de la cámara. */
@@ -63,6 +59,7 @@ export class Scene {
         scale: number;
         viewColliders: boolean;
         viewIds: boolean;
+        debugMode: boolean;
         autoFPS: boolean;
         viewPortWidth: number;
         viewPortHeight: number;
@@ -79,11 +76,9 @@ export class Scene {
         this.arrTokens = [];
         this.arr = [];
         this.mapkey = [];
-        this.drawing = false;
         this.tokenIndex = 0;
         this.tokenId = null;
         this.pause = false;
-        this.orders = [];
         this.message = " - - - ";
         this.autoFPS = true;
         this.fps = 60;
@@ -93,6 +88,7 @@ export class Scene {
             scale: 1,
             viewColliders: false,
             viewIds: false,
+            debugMode: false,
             autoFPS: true,
             viewPortWidth: 1920,
             viewPortHeight: 900,
@@ -140,6 +136,7 @@ export class Scene {
         this.config.scale = 1;
         this.config.viewColliders = false;
         this.config.viewIds = false;
+        this.config.debugMode = false;
         this.config.autoFPS = true;
         this.config.viewPortWidth = 1920;
         this.config.viewPortHeight = 900;
@@ -220,7 +217,7 @@ export class Scene {
             if (!t.destroy) {
                 if (typeof t.draw === 'function') {
                     // El offset {x, y} es la posición de la cámara que se resta/suma en el dibujo
-                    t.draw(this.ctx, undefined, undefined, { x: this.x, y: this.y });
+                    t.draw(this.ctx, undefined, undefined, { x: this.x, y: this.y }, this.config.debugMode);
                 }
             }
             // Dibujar colisionadores si la depuración está activa
@@ -348,16 +345,18 @@ export class Scene {
         }
         this.ctx.stroke();
 
-        // Marcas de coordenadas en puntos fijos
-        this.ctx.fillStyle = 'rgba(0, 255, 65, 0.5)';
-        this.ctx.font = '10px Arial';
-        const labelStep = gran * 5;
-        const startLabelX = Math.floor(minX / labelStep) * labelStep;
-        const startLabelY = Math.floor(minY / labelStep) * labelStep;
+        // Marcas de coordenadas en puntos fijos (solo en modo debug)
+        if (this.config.debugMode) {
+            this.ctx.fillStyle = 'rgba(0, 255, 65, 0.5)';
+            this.ctx.font = '10px Arial';
+            const labelStep = gran * 5;
+            const startLabelX = Math.floor(minX / labelStep) * labelStep;
+            const startLabelY = Math.floor(minY / labelStep) * labelStep;
 
-        for (let x = startLabelX; x <= endX; x += labelStep) {
-            for (let y = startLabelY; y <= endY; y += labelStep) {
-                this.ctx.fillText(`(${x},${y})`, x + this.x + 2, y + this.y - 2);
+            for (let x = startLabelX; x <= endX; x += labelStep) {
+                for (let y = startLabelY; y <= endY; y += labelStep) {
+                    this.ctx.fillText(`(${x},${y})`, x + this.x + 2, y + this.y - 2);
+                }
             }
         }
         this.ctx.restore();
@@ -425,6 +424,12 @@ export class Scene {
         if (viewIds) {
             viewIds.checked = this.config.viewIds;
             viewIds.onchange = () => { this.config.viewIds = viewIds.checked; viewIds.blur(); };
+        }
+
+        const debugMode = getElem('debug') as HTMLInputElement;
+        if (debugMode) {
+            debugMode.checked = this.config.debugMode;
+            debugMode.onchange = () => { this.config.debugMode = debugMode.checked; debugMode.blur(); };
         }
 
         const stopButton = getElem('stopAutomat');

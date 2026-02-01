@@ -63,8 +63,9 @@ export class Point {
      * @param lColor Color de línea (opcional).
      * @param fColor Color de relleno (opcional).
      * @param offset Desplazamiento de cámara para posicionamiento relativo.
+     * @param debugMode Indica si el modo debug está activo.
      */
-    draw(ctx: CanvasRenderingContext2D, lColor?: string, fColor?: string, offset?: {x: number, y: number}) {
+    draw(ctx: CanvasRenderingContext2D, lColor?: string, fColor?: string, offset?: {x: number, y: number}, debugMode?: boolean) {
         if (!ctx) return;
 
         // Prioridad de color: config.color > parámetros pasados > valores por defecto
@@ -86,13 +87,15 @@ export class Point {
         if (this.config.position === 'relative') {
             // Dibujar un pequeño cuadrado y su coordenada informativa
             ctx.fillRect(pos.x, pos.y, 4, 4);
-            if (this.config.viewName) {
+            if (this.config.viewName || debugMode) {
                 ctx.fillText('*(' + Math.round(this.x) + ',' + Math.round(this.y) + ')', pos.x, pos.y);
             }
         } else {
             // Posicionamiento absoluto (ignora offset)
             ctx.fillRect(this.x, this.y, 2, 2);
-            ctx.fillText('**(' + this.x + ',' + this.y + ')', Math.round(this.x), Math.round(this.y));
+            if (debugMode) {
+                ctx.fillText('**(' + this.x + ',' + this.y + ')', Math.round(this.x), Math.round(this.y));
+            }
         }
 
         ctx.stroke();

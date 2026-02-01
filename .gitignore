@@ -1,2 +1,11 @@
-.vscode/
-/.vscode
+node_modules/
+lib/**/*.js
+lib/**/*.js.map
+*.log
+verify_debug*.py
+verify_debug*.png
+server.log
+tsc_output.txt
+.DS_Store
+dist/
+build/

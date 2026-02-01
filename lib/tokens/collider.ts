@@ -207,13 +207,30 @@ export class ColliderToken extends ImgToken {
     /**
      * Sobrescribe el método move para integrar la lógica de colisiones.
      * Solo actualiza la posición visual si el colisionador confirma que el camino está despejado.
+     * En modo debug, actúa como un "pico" eliminando obstáculos y permitiendo el paso.
      */
-    async move(cmd: string, displ: number, tokens?: any[]): Promise<any> {
+    async move(cmd: string, displ: number, tokens?: any[], debugMode?: boolean): Promise<any> {
         const moveResult = await this.collider.moveCollider(cmd, displ, tokens);
+
         if (moveResult.canMove) {
             // El colisionador ya se movió, ahora sincronizamos el token visual
             return super.move(cmd, displ);
+        } else if (debugMode && moveResult.collisions.length > 0) {
+            // EFECTO PICO: Eliminamos los tokens con los que hemos colisionado
+            moveResult.collisions.forEach(targetId => {
+                const target = tokens?.find(t => t.id === targetId);
+                if (target) {
+                    target.delete = true; // Marcar para eliminación
+                }
+            });
+
+            // Forzamos el movimiento ignorando la colisión que acabamos de "limpiar"
+            super.move(cmd, displ);
+            this.collider.placeAt(this.x, this.y); // Sincronizar colisionador manualmente
+
+            return { canMove: true, collisions: [] };
         }
+
         return moveResult;
     }
 }

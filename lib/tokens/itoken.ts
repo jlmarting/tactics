@@ -53,13 +53,16 @@ export interface IToken {
      * @param lColor Color de línea.
      * @param fColor Color de relleno.
      * @param offset Desplazamiento de cámara.
+     * @param debugMode Indica si el modo debug está activo.
      */
-    draw(ctx: CanvasRenderingContext2D, lColor?: string, fColor?: string, offset?: { x: number, y: number }): any;
+    draw(ctx: CanvasRenderingContext2D, lColor?: string, fColor?: string, offset?: { x: number, y: number }, debugMode?: boolean): any;
 
     /**
      * Ejecuta un movimiento basado en un comando.
      * @param cmd Comando de movimiento ('up', 'down', 'left', 'right', etc.).
      * @param displ Distancia o magnitud del desplazamiento.
+     * @param tokens Lista de tokens para verificación de colisiones (opcional).
+     * @param debugMode Indica si el modo debug (pico) está activo (opcional).
      */
-    move(cmd: string, displ: number): any;
+    move(cmd: string, displ: number, tokens?: any[], debugMode?: boolean): any;
 }

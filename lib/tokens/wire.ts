@@ -30,7 +30,7 @@ export class WireToken extends CursorPoint {
         this.lastRad = this.rad;
     }
 
-    draw(ctx: CanvasRenderingContext2D, lColor?: string, fColor?: string, offset?: { x: number, y: number }) {
+    draw(ctx: CanvasRenderingContext2D, lColor?: string, fColor?: string, offset?: { x: number, y: number }, debugMode?: boolean) {
         if (this.config.enabled === false) {
             this.x = JSON.parse(this.bkpx);
             this.y = JSON.parse(this.bkpy);
@@ -39,7 +39,7 @@ export class WireToken extends CursorPoint {
             this.config.enabled = true;
         }
         const vectors = this.getVectors();
-        super.draw(ctx, undefined, undefined, offset);
+        super.draw(ctx, undefined, undefined, offset, debugMode);
         vectors.forEach(e => {
             e.draw(ctx, offset);
         });
@@ -52,7 +52,7 @@ export class WireToken extends CursorPoint {
         }
     }
 
-    move(cmd: string, displ: number): any {
+    move(cmd: string, displ: number, tokens?: any[], debugMode?: boolean): any {
         if (this.config.enabled === false) {
             this.x = JSON.parse(this.bkpx);
             this.y = JSON.parse(this.bkpy);
